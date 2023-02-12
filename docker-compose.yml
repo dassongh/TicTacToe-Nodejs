@@ -1,0 +1,63 @@
+version: '3.9'
+
+networks:
+  app_network:
+    driver: bridge
+
+services:
+  server1:
+    container_name: 'server1'
+    environment:
+      - APPID=1
+    build: .
+    ports:
+      - "1111:1111"
+    networks:
+      - app_network
+
+  server2:
+    container_name: 'server2'
+    environment:
+      - APPID=2
+    build: .
+    ports:
+      - "2222:1111"
+    networks:
+      - app_network
+
+  lb:
+    image: nginx
+    build:
+      context: ./loadbalancer
+    container_name: 'nginx'
+    links:
+      - server1
+      - server2
+    depends_on:
+      - server1
+      - server2
+    ports:
+      - 8080:80
+    networks:
+      - app_network
+
+  redis:
+    image: "redis"
+    container_name: "redis"
+    ports:
+      - 6379:6379
+    networks:
+      - app_network
+
+  postgres:
+    container_name: 'postgres'
+    image: postgres
+    environment:
+      POSTGRES_DB: "tictactoe"
+      POSTGRES_USER: "superuser"
+      POSTGRES_PASSWORD: "superpassword"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5433:5432"
+    networks:
+      - app_network

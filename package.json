@@ -1,0 +1,30 @@
+{
+  "name": "tictactoe-nodejs",
+  "version": "1.0.0",
+  "description": "Online game with leaderboard",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "start:local": "nodemon ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dassongh/TicTacToe-Nodejs.git"
+  },
+  "keywords": [
+    "postgres",
+    "websockets",
+    "redis",
+    "node",
+    "nginx"
+  ],
+  "author": "Alexander S. <oleksandr.slv@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dassongh/TicTacToe-Nodejs/issues"
+  },
+  "homepage": "https://github.com/dassongh/TicTacToe-Nodejs#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
