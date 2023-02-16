@@ -2,10 +2,10 @@
   "name": "tictactoe-nodejs",
   "version": "1.0.0",
   "description": "Online game with leaderboard",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node ./src/index.js",
-    "start:local": "nodemon ./src/index.js"
+    "start": "node ./src/server.js",
+    "start:local": "nodemon ./src/server.js"
   },
   "repository": {
     "type": "git",
@@ -26,5 +26,9 @@
   "homepage": "https://github.com/dassongh/TicTacToe-Nodejs#readme",
   "devDependencies": {
     "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "pg": "8.2.x"
   }
 }
