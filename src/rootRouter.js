@@ -1,6 +1,7 @@
 const renderStartPage = require('./modules/page/startPage');
 const userRouter = require('./modules/user/user.router');
 
+const findRoute = require('./utils/findRoute');
 const httpError = require('./utils/httpError');
 
 const routes = {
@@ -8,13 +9,13 @@ const routes = {
   '/api/user': userRouter,
 };
 
-async function rootRouter(req, res) {
+module.exports = async function rootRouter(req, res) {
+  const route = findRoute(req.url, routes);
+
   try {
-    routes[req.url](req, res);
+    route(req, res);
   } catch (err) {
     console.error(err);
     httpError(res, 404, 'Not found');
   }
-}
-
-module.exports = rootRouter;
+};
