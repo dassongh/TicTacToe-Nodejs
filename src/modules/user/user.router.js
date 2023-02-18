@@ -3,17 +3,18 @@ const url = require('url');
 const userController = require('./user.controller');
 
 const actionHandler = require('../../utils/actionHandler');
-const { getBody } = require('../../utils/extract');
+const { getBody, getId, getPagination } = require('../../utils/extract');
 const matchRoute = require('../../utils/matchRoute');
 const httpError = require('../../utils/httpError');
 
 const routes = {
   '/': {
-    GET: actionHandler(userController.get),
+    GET: actionHandler(userController.get, getPagination),
     POST: actionHandler(userController.create, getBody),
   },
   '/:id': {
-    GET: (req, res) => res.end(),
+    GET: actionHandler(userController.getById, getId),
+    DELETE: actionHandler(userController.deleteById, getId),
   },
 };
 

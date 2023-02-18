@@ -1,8 +1,20 @@
 const db = require('../../db');
 
-function get(projection) {
+function get(projection, limit, offset) {
   const select = projection || '*';
-  const sql = `SELECT ${select} FROM users`;
+  const sql = `
+  SELECT ${select} FROM users
+  LIMIT ${limit}
+  OFFSET ${offset}
+  `;
+
+  return db.query(sql);
+}
+
+function count() {
+  const sql = `
+    SELECT COUNT(*) FROM users
+  `;
 
   return db.query(sql);
 }
@@ -27,4 +39,12 @@ function getById(id, projection) {
   return db.query(sql);
 }
 
-module.exports = { get, create, getById };
+function deleteById(id) {
+  const sql = `
+    DELETE from users
+    WHERE id = ${id}
+  `;
+  return db.query(sql);
+}
+
+module.exports = { get, create, getById, count, deleteById };

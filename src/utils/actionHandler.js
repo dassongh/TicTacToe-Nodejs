@@ -1,26 +1,32 @@
 const httpError = require('./httpError');
 
-function actionHandler(action, mapProperty) {
+module.exports = function actionHandler(action, mapProperty) {
   return async (req, res) => {
     let property = [];
 
     if (mapProperty) {
-      if (mapProperty.constructor.name === 'AsyncFunction') {
-        property = [await mapProperty(req)];
+      if (Array.isArray(mapProperty)) {
+        for (const prop of mapProperty) {
+          if (prop.constructor.name === 'AsyncFunction') {
+            property.push(await mapProperty(req));
+          } else {
+            property.push(mapProperty(req));
+          }
+        }
+      } else {
+        if (mapProperty.constructor.name === 'AsyncFunction') {
+          property = [await mapProperty(req)];
+        } else {
+          property = [mapProperty(req)];
+        }
       }
-
-      // if (Array.isArray(mapProperty)) {
-      //   property = mapProperty.map(property => property(req));
-      // } else {
-      //   property = [mapProperty(req)];
-      // }
     }
 
     return action(...property)
       .then(result => sendResponseSuccess(res, result))
       .catch(err => sendResponseFail(res, err));
   };
-}
+};
 
 function sendResponseSuccess(res, result) {
   if (!result) {
@@ -48,5 +54,3 @@ function sendResponseSuccess(res, result) {
 function sendResponseFail(res, error) {
   httpError(res, error.status || 500, error.message);
 }
-
-module.exports = actionHandler;

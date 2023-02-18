@@ -5,4 +5,19 @@ async function getBody(req) {
   return JSON.parse(data);
 }
 
-module.exports = { getBody };
+function getId(req) {
+  return req.params.id;
+}
+
+function getQuery(req) {
+  return req.query;
+}
+
+function getPagination(req) {
+  return {
+    page: Number(req.query.page) || 1,
+    limit: Number(req.query.limit) || 10,
+  };
+}
+
+module.exports = { getBody, getId, getQuery, getPagination };
