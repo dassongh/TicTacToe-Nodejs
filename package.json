@@ -4,8 +4,10 @@
   "description": "Online game with leaderboard",
   "main": "server.js",
   "scripts": {
-    "start": "node ./src/server.js",
-    "start:local": "nodemon ./src/server.js"
+    "start": "npx webpack --config webpack.config.js && node ./src/server.js",
+    "start:local": "nodemon ./src/server.js",
+    "dev": "npx webpack --config webpack.config.js && nodemon ./src/server.js",
+    "dev:client": "webpack serve"
   },
   "repository": {
     "type": "git",
@@ -25,9 +27,18 @@
   },
   "homepage": "https://github.com/dassongh/TicTacToe-Nodejs#readme",
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.2",
+    "nodemon": "^2.0.20",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+    "css-loader": "^6.7.3",
     "dotenv": "^16.0.3",
     "pg": "8.2.x"
   }

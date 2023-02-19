@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs/promises');
 
 async function renderStartPage(req, res) {
-  const filePath = path.resolve(__dirname, '../../frontend/index.html');
+  const filePath = path.resolve(__dirname, '../../../dist/index.html');
 
   let page;
   try {
