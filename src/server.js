@@ -12,3 +12,7 @@ server.listen(PORT, () => {
     .then(() => console.log('Database created successfully'))
     .catch(err => console.error('DB init error: ', err));
 });
+
+server.on('error', err => {
+  console.error(err);
+});

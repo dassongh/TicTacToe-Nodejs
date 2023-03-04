@@ -2,7 +2,12 @@ async function getBody(req) {
   const buffers = [];
   for await (const chunk of req) buffers.push(chunk);
   const data = Buffer.concat(buffers).toString();
-  return JSON.parse(data);
+  let parsedData;
+  try {
+    parsedData = JSON.parse(data);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function getId(req) {

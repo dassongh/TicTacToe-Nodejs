@@ -29,7 +29,7 @@ async function create(body) {
     throw new DBError(err);
   }
 
-  return { payload: { message: 'Created' } };
+  return { status: 201, payload: { message: 'Created' } };
 }
 
 async function getById(id) {
