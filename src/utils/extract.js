@@ -2,12 +2,15 @@ async function getBody(req) {
   const buffers = [];
   for await (const chunk of req) buffers.push(chunk);
   const data = Buffer.concat(buffers).toString();
+
   let parsedData;
   try {
     parsedData = JSON.parse(data);
   } catch (err) {
     console.error(err);
   }
+
+  return parsedData;
 }
 
 function getId(req) {
@@ -25,4 +28,8 @@ function getPagination(req) {
   };
 }
 
-module.exports = { getBody, getId, getQuery, getPagination };
+function getDeviceId(req) {
+  return req.socket.localAddress;
+}
+
+module.exports = { getBody, getId, getQuery, getPagination, getDeviceId };

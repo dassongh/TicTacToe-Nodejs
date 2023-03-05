@@ -1,7 +1,6 @@
 const db = require('../../db');
 
-function get(projection, limit, offset) {
-  const select = projection || '*';
+function get(select = '*', limit, offset) {
   const sql = `
   SELECT ${select} FROM users
   LIMIT ${limit}
@@ -23,14 +22,14 @@ function create(payload) {
   const sql = `
     INSERT INTO users(fullname, nickname, email, password)
     VALUES($1, $2, $3, $4)
+    RETURNING id, fullname, nickname, email
   `;
   const params = Object.values(payload);
 
   return db.query(sql, params);
 }
 
-function getById(id, projection) {
-  const select = projection || '*';
+function getById(id, select = '*') {
   const sql = `
     SELECT ${select} FROM users
     WHERE id = ${id};
@@ -47,4 +46,19 @@ function deleteById(id) {
   return db.query(sql);
 }
 
-module.exports = { get, create, getById, count, deleteById };
+/**
+ * Finds users from the database based on a given filter and projection.
+ * @param {string} filter - The condition for selecting data from the 'users' table.
+ * @param {string} [select='*'] - The list of columns to select from the 'users' table. Default is all columns.
+ * @returns {Promise} A Promise that resolves to an object of db query that matches the given filter and projection.
+ */
+function find(filter, select = '*') {
+  const sql = `
+    SELECT ${select} FROM users
+    WHERE ${filter};
+  `;
+
+  return db.query(sql);
+}
+
+module.exports = { get, create, getById, count, deleteById, find };

@@ -8,9 +8,9 @@ module.exports = function actionHandler(action, mapProperty) {
       if (Array.isArray(mapProperty)) {
         for (const prop of mapProperty) {
           if (prop.constructor.name === 'AsyncFunction') {
-            property.push(await mapProperty(req));
+            property.push(await prop(req));
           } else {
-            property.push(mapProperty(req));
+            property.push(prop(req));
           }
         }
       } else {

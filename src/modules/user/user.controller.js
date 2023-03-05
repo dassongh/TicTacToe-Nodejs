@@ -7,7 +7,7 @@ async function get({ page, limit }) {
   let users, count;
   try {
     [users, count] = await Promise.all([
-      userService.get('id, fullname, nickname', limit, offset),
+      userService.get('id, fullname, nickname, email', limit, offset),
       userService.count(),
     ]);
   } catch (err) {
@@ -23,13 +23,14 @@ async function get({ page, limit }) {
 }
 
 async function create(body) {
+  let user;
   try {
-    await userService.create(body);
+    user = await userService.create(body);
   } catch (err) {
     throw new DBError(err);
   }
 
-  return { status: 201, payload: { message: 'Created' } };
+  return { status: 201, payload: { data: user.rows[0] } };
 }
 
 async function getById(id) {

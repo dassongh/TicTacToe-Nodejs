@@ -3,13 +3,13 @@ const url = require('url');
 const authController = require('./auth.controller');
 
 const actionHandler = require('../../utils/actionHandler');
-const { getBody } = require('../../utils/extract');
+const { getBody, getDeviceId } = require('../../utils/extract');
 const matchRoute = require('../../utils/matchRoute');
 const httpError = require('../../utils/httpError');
 
 const routes = {
-  '/': {
-    POST: actionHandler(authController.register, getBody),
+  '/register': {
+    POST: actionHandler(authController.register, [getBody, getDeviceId]),
   },
 };
 

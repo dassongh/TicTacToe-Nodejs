@@ -40,6 +40,7 @@
   "dependencies": {
     "css-loader": "^6.7.3",
     "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.0",
     "pg": "8.2.x"
   }
 }
