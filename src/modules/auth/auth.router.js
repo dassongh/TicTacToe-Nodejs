@@ -11,6 +11,9 @@ const routes = {
   '/register': {
     POST: actionHandler(authController.register, [getBody, getDeviceId]),
   },
+  '/login': {
+    POST: actionHandler(authController.login, [getBody, getDeviceId]),
+  },
 };
 
 async function authRouter(req, res) {

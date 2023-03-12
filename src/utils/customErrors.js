@@ -11,6 +11,6 @@ function DBError(error) {
   console.error('DBError: ', error.message);
 }
 
-// DBError.prototype = Object.create(CustomError.prototype)
+// DBError.prototype = Object.create(CustomError.prototype);
 
 module.exports = { CustomError, DBError };

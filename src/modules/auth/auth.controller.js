@@ -11,7 +11,7 @@ const { PASSWORD_SALT } = require('../../config');
 async function register(userData, deviceId) {
   let existedUser;
   try {
-    existedUser = await userService.find(`email = '${userData.email}'`);
+    existedUser = await userService.findByFilter(`email = '${userData.email}'`);
   } catch (err) {
     throw new DBError(err);
   }
@@ -54,8 +54,58 @@ async function register(userData, deviceId) {
   };
 }
 
+async function login({ email, password }, deviceId) {
+  let dbResult;
+  try {
+    dbResult = await userService.findByFilter(`email = '${email}'`);
+  } catch (err) {
+    throw new DBError(err);
+  }
+  if (!dbResult.rowCount) {
+    throw new CustomError(400, 'Password or email incorrect');
+  }
+
+  const user = dbResult.rows[0];
+  const passwordHash = _passwordCrypt(password);
+  if (passwordHash !== user.password) {
+    throw new CustomError(400, 'Password or email incorrect');
+  }
+
+  let sessionDbResult;
+  try {
+    sessionDbResult = await sessionService.findByFilter(
+      `"userId" = '${user.id}' AND "deviceId" = '${deviceId}'`
+    );
+  } catch (err) {
+    throw new DBError(err);
+  }
+
+  const tokens = {
+    access: createToken({ userId: user.id }, TOKEN_TYPE.ACCESS),
+    refresh: createToken({ userId: user.id }, TOKEN_TYPE.REFRESH),
+  };
+  const session = sessionDbResult.rows[0];
+
+  if (session) {
+    try {
+      await sessionService.update(`id = '${session.id}'`, `"refreshToken" = '${tokens.refresh}'`);
+    } catch (err) {
+      throw new DBError(err);
+    }
+  } else {
+    const sessionPayload = { userId, deviceId, refreshToken: tokens.refresh };
+    try {
+      await sessionService.create(sessionPayload);
+    } catch (err) {
+      throw new DBError(err);
+    }
+  }
+
+  return { payload: { data: { user, tokens } } };
+}
+
 function _passwordCrypt(password) {
   return crypto.pbkdf2Sync(password, PASSWORD_SALT, 1000, 64, 'sha512').toString('hex');
 }
 
-module.exports = { register };
+module.exports = { register, login };

@@ -23,7 +23,7 @@ async function userRouter(req, res) {
   if (!userUrl) {
     userUrl = '/';
   }
-
+  console.log(req.user);
   const parsedUrl = url.parse(userUrl, true);
   const pathName = parsedUrl.pathname;
 

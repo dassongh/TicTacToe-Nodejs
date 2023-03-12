@@ -5,6 +5,7 @@ const authRouter = require('./modules/auth/auth.router');
 const findRoute = require('./utils/findRoute');
 const httpError = require('./utils/httpError');
 const serveStatic = require('./modules/page/serveStatic');
+const authenticate = require('./utils/authenticate');
 
 const routes = {
   '/': renderStartPage,
@@ -16,8 +17,8 @@ const routes = {
 
 module.exports = async function rootRouter(req, res) {
   const route = findRoute(req.url, routes);
-
   try {
+    await authenticate(req, res);
     route(req, res);
   } catch (err) {
     console.error(err);

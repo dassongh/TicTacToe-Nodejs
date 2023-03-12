@@ -29,7 +29,7 @@ function getPagination(req) {
 }
 
 function getDeviceId(req) {
-  return req.socket.localAddress;
+  return req.socket.localAddress || req.socket.remoteAddress;
 }
 
 module.exports = { getBody, getId, getQuery, getPagination, getDeviceId };

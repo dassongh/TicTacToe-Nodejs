@@ -10,4 +10,22 @@ function create(payload) {
   return db.query(sql, params);
 }
 
-module.exports = { create };
+function findByFilter(filter, select = '*') {
+  const sql = `
+    SELECT ${select} FROM sessions
+    WHERE ${filter};
+  `;
+
+  return db.query(sql);
+}
+
+function update(filter, setStatement) {
+  const sql = `
+    UPDATE sessions
+    SET ${setStatement}
+    WHERE ${filter}
+  `;
+  return db.query(sql);
+}
+
+module.exports = { create, findByFilter, update };

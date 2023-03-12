@@ -52,7 +52,7 @@ function deleteById(id) {
  * @param {string} [select='*'] - The list of columns to select from the 'users' table. Default is all columns.
  * @returns {Promise} A Promise that resolves to an object of db query that matches the given filter and projection.
  */
-function find(filter, select = '*') {
+function findByFilter(filter, select = '*') {
   const sql = `
     SELECT ${select} FROM users
     WHERE ${filter};
@@ -61,4 +61,4 @@ function find(filter, select = '*') {
   return db.query(sql);
 }
 
-module.exports = { get, create, getById, count, deleteById, find };
+module.exports = { get, create, getById, count, deleteById, findByFilter };
