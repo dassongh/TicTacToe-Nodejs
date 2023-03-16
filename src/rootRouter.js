@@ -18,7 +18,7 @@ const routes = {
 module.exports = async function rootRouter(req, res) {
   const route = findRoute(req.url, routes);
   try {
-    await authenticate(req, res);
+    await authenticate(req);
     route(req, res);
   } catch (err) {
     console.error(err);

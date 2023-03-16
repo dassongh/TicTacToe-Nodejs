@@ -104,3 +104,4 @@ dist
 .tern-port
 pgdata
 .vscode
+.DS_Store

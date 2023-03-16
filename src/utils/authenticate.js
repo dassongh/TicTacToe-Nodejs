@@ -8,7 +8,7 @@ function getTokenFromHeader(headers) {
   return null;
 }
 
-async function authenticate(req, res) {
+module.exports = async function authenticate(req) {
   const token = getTokenFromHeader(req.headers);
   const deviceId = req.socket.localAddress || req.socket.remoteAddress;
 
@@ -35,6 +35,4 @@ async function authenticate(req, res) {
 
   req.user = { userId: tokenInfo.userId, deviceId };
   return;
-}
-
-module.exports = authenticate;
+};
