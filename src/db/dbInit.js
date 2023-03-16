@@ -32,8 +32,6 @@ ALTER TABLE IF EXISTS public.sessions
     OWNER to superuser;
 `;
 
-function initDb() {
+module.exports = function initDb() {
   return db.query(sql);
-}
-
-module.exports = initDb;
+};
