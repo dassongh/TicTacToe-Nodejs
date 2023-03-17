@@ -1,5 +1,5 @@
 const { verifyToken } = require('./jwtToken');
-const { TOKEN_TYPE } = require('../modules/auth/auth.constants');
+const { Token_Types } = require('../modules/auth/auth.constants');
 const sessionService = require('../modules/auth/auth.service');
 
 function getTokenFromHeader(headers) {
@@ -16,7 +16,7 @@ module.exports = async function authenticate(req) {
 
   let tokenInfo;
   try {
-    tokenInfo = verifyToken(token, TOKEN_TYPE.ACCESS);
+    tokenInfo = verifyToken(token, Token_Types.ACCESS);
   } catch (err) {
     return;
   }

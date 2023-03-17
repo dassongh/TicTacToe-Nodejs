@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 const userService = require('../user/user.service');
 const sessionService = require('./auth.service');
-const { TOKEN_TYPE } = require('./auth.constants');
+const { Token_Types } = require('./auth.constants');
 
 const { DBError, CustomError } = require('../../utils/customErrors');
 const { createToken } = require('../../utils/jwtToken');
@@ -32,8 +32,8 @@ async function register(userData, deviceId) {
 
   const userId = newUser.rows[0].id;
   const tokens = {
-    access: createToken({ userId }, TOKEN_TYPE.ACCESS),
-    refresh: createToken({ userId }, TOKEN_TYPE.REFRESH),
+    access: createToken({ userId }, Token_Types.ACCESS),
+    refresh: createToken({ userId }, Token_Types.REFRESH),
   };
 
   const sessionPayload = { userId, deviceId, refreshToken: tokens.refresh };
@@ -81,8 +81,8 @@ async function login({ email, password }, deviceId) {
   }
 
   const tokens = {
-    access: createToken({ userId: user.id }, TOKEN_TYPE.ACCESS),
-    refresh: createToken({ userId: user.id }, TOKEN_TYPE.REFRESH),
+    access: createToken({ userId: user.id }, Token_Types.ACCESS),
+    refresh: createToken({ userId: user.id }, Token_Types.REFRESH),
   };
   const session = sessionDbResult.rows[0];
 
