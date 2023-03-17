@@ -29,6 +29,13 @@ module.exports = function actionHandler(action, mapProperty) {
 };
 
 function sendResponseSuccess(res, result) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json',
+  };
+
   if (!result) {
     res.statusCode = 200;
     return res.end();
@@ -37,16 +44,16 @@ function sendResponseSuccess(res, result) {
   const { status = false, payload = false } = result;
 
   if (status && typeof status === 'number' && payload) {
-    res.writeHead(status, { 'Content-Type': 'application/json' });
+    res.writeHead(status, headers);
     res.end(JSON.stringify(payload));
   } else if (status && typeof status === 'number' && !payload) {
     res.statusCode = status;
     res.end();
   } else if (!status && payload) {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, headers);
     res.end(JSON.stringify(payload));
   } else {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, headers);
     res.end(JSON.stringify(result));
   }
 }

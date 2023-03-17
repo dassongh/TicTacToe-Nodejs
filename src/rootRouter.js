@@ -17,6 +17,17 @@ const routes = {
 
 module.exports = async function rootRouter(req, res) {
   const route = findRoute(req.url, routes);
+  if (req.method === 'OPTIONS') {
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    res.writeHead(204, headers);
+    return res.end();
+  }
+
   try {
     await authenticate(req);
     route(req, res);

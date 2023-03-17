@@ -7,6 +7,49 @@
     <title>Document</title>
   </head>
   <body>
-    <h1>Front end is going to be here</h1>
+    <div class="container">
+      <h1 class="welcome-heading">Welcome!</h1>
+      <p class="welcome-paragraph">Login or register to enjoy the game</p>
+      <button id="loginBtn" class="welcome-button">Login</button>
+      <button id="registerBtn" class="welcome-button">Register</button>
+    </div>
+
+    <div id="loginModal" class="modal">
+      <div class="modal-content">
+        <span id="loginClose" class="close">&times;</span>
+        <h2 id="modalTitle">Login</h2>
+        <form id="modalForm">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+      <div class="modal-content">
+        <span id="registerClose" class="close">&times;</span>
+        <h2 id="modalTitle">Register</h2>
+        <form id="modalForm">
+          <label for="nickname">Nickname:</label>
+          <input type="text" id="nickname" name="nickname" required />
+
+          <label for="surname">Surname:</label>
+          <input type="surname" id="surname" name="surname" required />
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
