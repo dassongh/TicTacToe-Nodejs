@@ -61,4 +61,13 @@ function findByFilter(filter, select = '*') {
   return db.query(sql);
 }
 
-module.exports = { get, create, getById, count, deleteById, findByFilter };
+function update(filter, setStatement) {
+  const sql = `
+    UPDATE users
+    SET ${setStatement}
+    WHERE ${filter}
+  `;
+  return db.query(sql);
+}
+
+module.exports = { get, create, getById, count, deleteById, findByFilter, update };

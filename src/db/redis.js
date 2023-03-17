@@ -8,4 +8,12 @@ function get(key) {
   return redisClient.get(key);
 }
 
-module.exports = { set, get };
+function hSet(...args) {
+  return redisClient.hSet(...args);
+}
+
+function hGetAll(key) {
+  return redisClient.hGetAll(key);
+}
+
+module.exports = { set, get, hSet, hGetAll };

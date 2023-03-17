@@ -5,6 +5,7 @@ const { PORT } = require('./config');
 const rootRouter = require('./rootRouter');
 const initDb = require('./db/dbInit');
 const redisClient = require('./db/redisClient');
+const WebSocket = require('./modules/websocket/websocket.service');
 
 const APPID = process.env.APPID;
 const server = http.createServer(rootRouter);
@@ -20,11 +21,7 @@ server.listen(PORT, () => {
     .catch(err => console.error('DB init error: ', err));
 });
 
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', () => {
-  console.log(APPID, 'connected');
-});
+WebSocket.init({ server });
 
 server.on('error', err => {
   console.error(err);

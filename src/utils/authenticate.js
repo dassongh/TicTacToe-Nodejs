@@ -10,8 +10,6 @@ function getTokenFromHeader(headers) {
 
 module.exports = async function authenticate(req) {
   const token = getTokenFromHeader(req.headers);
-  const deviceId = req.socket.localAddress || req.socket.remoteAddress;
-
   req.user = null;
 
   if (!token) return;
@@ -25,14 +23,12 @@ module.exports = async function authenticate(req) {
 
   let sessionDbResult;
   try {
-    sessionDbResult = await sessionService.findByFilter(
-      `"userId" = '${tokenInfo.userId}' AND "deviceId" = '${deviceId}'`
-    );
+    sessionDbResult = await sessionService.findByFilter(`"userId" = '${tokenInfo.userId}'`);
   } catch (err) {
     throw new DBError(err);
   }
   if (!sessionDbResult.rowCount) return;
 
-  req.user = { userId: tokenInfo.userId, deviceId };
+  req.user = { userId: tokenInfo.userId };
   return;
 };
