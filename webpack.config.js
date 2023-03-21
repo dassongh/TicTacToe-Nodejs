@@ -7,7 +7,8 @@ module.exports = {
   mode: process.env.NODE_ENV,
   entry: {
     app: './src/frontend/index.js',
-    // styles: './src/frontend/styles.css',
+    login: './src/frontend/login.js',
+    register: './src/frontend/register.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -34,6 +35,17 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/frontend/index.html',
+      chunks: ['app'],
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/frontend/login.html',
+      filename: 'login.html',
+      chunks: ['login'],
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/frontend/register.html',
+      filename: 'register.html',
+      chunks: ['register'],
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css',

@@ -1,5 +1,4 @@
 import { login } from './service';
-import { Base_Url } from './constants';
 
 const refs = {
   registerBtn: document.getElementById('registerBtn'),
@@ -22,15 +21,29 @@ refs.loginBtn.addEventListener('click', () => {
       password: data.get('password'),
     };
 
-    // let response;
-    // try {
-    //   response = await login(loginPayload);
-    // } catch (err) {
-    //   console.error(err);
-    // }
-    login(loginPayload)
-      .then(console.log)
-      .catch(err => console.error(err));
+    let response, parsedResponse;
+    try {
+      response = await login(loginPayload);
+      parsedResponse = await response.json();
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (parsedResponse.error) {
+      form.childNodes.forEach(node => {
+        node.value = '';
+      });
+      alert('Email or login incorrect');
+      return;
+    }
+
+    const tokens = {
+      access: parsedResponse.data.tokens.access,
+      refresh: parsedResponse.data.tokens.refresh,
+    };
+    localStorage.setItem('accessToken', tokens.access);
+    localStorage.setItem('refreshToken', tokens.refresh);
+    location.assign('http://localhost:1111/game');
   });
 });
 
@@ -43,6 +56,6 @@ refs.registerBtn.addEventListener('click', () => {
 function closeModal(modal) {
   return () => {
     modal.style.display = 'none';
-    removeEventListener(closeModal);
+    removeEventListener(closeModal());
   };
 }

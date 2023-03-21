@@ -7,49 +7,27 @@
     <title>Document</title>
   </head>
   <body>
-    <div class="container">
-      <h1 class="welcome-heading">Welcome!</h1>
-      <p class="welcome-paragraph">Login or register to enjoy the game</p>
-      <button id="loginBtn" class="welcome-button">Login</button>
-      <button id="registerBtn" class="welcome-button">Register</button>
-    </div>
-
-    <div id="loginModal" class="modal">
-      <div class="modal-content">
-        <span id="loginClose" class="close">&times;</span>
-        <h2 id="modalTitle">Login</h2>
-        <form id="modalForm">
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required />
-
-          <button type="submit">Submit</button>
-        </form>
+    <section>
+      <div class="container">
+        <h1 class="welcome-heading">Welcome!</h1>
+        <p class="welcome-paragraph">Login or register to enjoy the game</p>
+        <button id="loginBtn" class="welcome-button">Login</button>
+        <button id="registerBtn" class="welcome-button">Register</button>
+        <h1 class="game--title">Tic-Tac-Toe</h1>
+        <div class="game--container">
+          <div data-cell-index="0" class="cell"></div>
+          <div data-cell-index="1" class="cell"></div>
+          <div data-cell-index="2" class="cell"></div>
+          <div data-cell-index="3" class="cell"></div>
+          <div data-cell-index="4" class="cell"></div>
+          <div data-cell-index="5" class="cell"></div>
+          <div data-cell-index="6" class="cell"></div>
+          <div data-cell-index="7" class="cell"></div>
+          <div data-cell-index="8" class="cell"></div>
+        </div>
+        <h2 class="game--status"></h2>
+        <button class="game--restart">Restart Game</button>
       </div>
-    </div>
-
-    <div id="registerModal" class="modal">
-      <div class="modal-content">
-        <span id="registerClose" class="close">&times;</span>
-        <h2 id="modalTitle">Register</h2>
-        <form id="modalForm">
-          <label for="nickname">Nickname:</label>
-          <input type="text" id="nickname" name="nickname" required />
-
-          <label for="surname">Surname:</label>
-          <input type="surname" id="surname" name="surname" required />
-
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required />
-
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </div>
+    </section>
   </body>
 </html>

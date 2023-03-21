@@ -1,4 +1,6 @@
 const renderStartPage = require('./modules/page/startPage');
+const renderLoginPage = require('./modules/page/loginPage');
+const renderRegisterPage = require('./modules/page/registerPage');
 const userRouter = require('./modules/user/user.router');
 const authRouter = require('./modules/auth/auth.router');
 
@@ -9,6 +11,8 @@ const authenticate = require('./utils/authenticate');
 
 const routes = {
   '/': renderStartPage,
+  '/login': renderLoginPage,
+  '/register': renderRegisterPage,
   '/app.js': serveStatic,
   '/app.css': serveStatic,
   '/api/user': userRouter,
@@ -21,6 +25,7 @@ module.exports = async function rootRouter(req, res) {
     const headers = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Max-Age': 2592000,
       'Access-Control-Allow-Headers': 'Content-Type',
     };
 
