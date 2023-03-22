@@ -48,7 +48,7 @@ module.exports = {
       chunks: ['register'],
     }),
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: 'app.css',
     }),
   ],
 };

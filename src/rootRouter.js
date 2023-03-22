@@ -15,6 +15,7 @@ const routes = {
   '/register': renderRegisterPage,
   '/app.js': serveStatic,
   '/app.css': serveStatic,
+  '/login.js': serveStatic,
   '/api/user': userRouter,
   '/api/auth': authRouter,
 };
@@ -26,7 +27,7 @@ module.exports = async function rootRouter(req, res) {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Max-Age': 2592000,
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
 
     res.writeHead(204, headers);

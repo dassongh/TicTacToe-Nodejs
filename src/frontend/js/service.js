@@ -10,6 +10,11 @@ export function login(data) {
   });
 }
 
-export function getCurrentUser() {
-  return fetch(`${BASE_URL}/api/user`);
+export function getCurrentUser(token) {
+  return fetch(`${BASE_URL}/api/auth/current`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 }
