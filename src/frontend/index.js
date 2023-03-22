@@ -1,4 +1,2 @@
 import './css/styles.css';
-import './js/main/loginBtnHandler';
-import './js/main/registerBtnHandler';
-import './js/main/init';
+import './js/init';

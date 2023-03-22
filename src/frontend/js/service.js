@@ -18,3 +18,12 @@ export function getCurrentUser(token) {
     },
   });
 }
+
+export function logout(token) {
+  return fetch(`${BASE_URL}/api/auth/logout`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
