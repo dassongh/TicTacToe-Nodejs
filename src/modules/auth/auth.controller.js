@@ -93,7 +93,7 @@ async function login({ email, password }, deviceId) {
       throw new DBError(err);
     }
   } else {
-    const sessionPayload = { userId, deviceId, refreshToken: tokens.refresh };
+    const sessionPayload = { userId: user.id, deviceId, refreshToken: tokens.refresh };
     try {
       await sessionService.create(sessionPayload);
     } catch (err) {
@@ -121,8 +121,18 @@ async function current(userId) {
   return { payload: { data: user } };
 }
 
+async function logout(userId) {
+  try {
+    await sessionService.deleteSession(`"userId"=${userId}`);
+  } catch (err) {
+    throw new DBError(err);
+  }
+
+  return { status: 200 };
+}
+
 function _passwordCrypt(password) {
   return crypto.pbkdf2Sync(password, PASSWORD_SALT, 1000, 64, 'sha512').toString('hex');
 }
 
-module.exports = { register, login, current };
+module.exports = { register, login, current, logout };

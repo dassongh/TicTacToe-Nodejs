@@ -17,6 +17,9 @@ const routes = {
   '/current': {
     GET: actionHandler(authController.current, getCurrentUserId),
   },
+  '/logout': {
+    POST: actionHandler(authController.logout, getCurrentUserId),
+  },
 };
 
 module.exports = async function authRouter(req, res) {

@@ -28,4 +28,12 @@ function update(filter, setStatement) {
   return db.query(sql);
 }
 
-module.exports = { create, findByFilter, update };
+function deleteSession(filter) {
+  const sql = `
+    DELETE from sessions
+    WHERE ${filter}
+  `;
+  return db.query(sql);
+}
+
+module.exports = { create, findByFilter, update, deleteSession };
