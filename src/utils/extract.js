@@ -32,4 +32,9 @@ function getDeviceId(req) {
   return req.socket.localAddress || req.socket.remoteAddress;
 }
 
-module.exports = { getBody, getId, getQuery, getPagination, getDeviceId };
+function getCurrentUserId(req) {
+  if (!req.user) return null;
+  return Number(req.user.userId);
+}
+
+module.exports = { getBody, getId, getQuery, getPagination, getDeviceId, getCurrentUserId };

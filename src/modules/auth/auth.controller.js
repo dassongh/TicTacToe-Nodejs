@@ -104,8 +104,25 @@ async function login({ email, password }, deviceId) {
   return { payload: { data: { user, tokens } } };
 }
 
+async function current(userId) {
+  let dbResult;
+  try {
+    dbResult = await userService.getById(userId, 'id, nickname');
+  } catch (err) {
+    throw new DBError(err);
+  }
+
+  if (!dbResult.rowCount) {
+    throw new CustomError(404, 'Not found');
+  }
+
+  const user = dbResult.rows[0];
+
+  return { payload: { data: user } };
+}
+
 function _passwordCrypt(password) {
   return crypto.pbkdf2Sync(password, PASSWORD_SALT, 1000, 64, 'sha512').toString('hex');
 }
 
-module.exports = { register, login };
+module.exports = { register, login, current };

@@ -3,7 +3,7 @@ const url = require('url');
 const authController = require('./auth.controller');
 
 const actionHandler = require('../../utils/actionHandler');
-const { getBody, getDeviceId } = require('../../utils/extract');
+const { getBody, getDeviceId, getCurrentUserId } = require('../../utils/extract');
 const matchRoute = require('../../utils/matchRoute');
 const httpError = require('../../utils/httpError');
 
@@ -13,6 +13,9 @@ const routes = {
   },
   '/login': {
     POST: actionHandler(authController.login, [getBody, getDeviceId]),
+  },
+  '/current': {
+    GET: actionHandler(authController.current, getCurrentUserId),
   },
 };
 
