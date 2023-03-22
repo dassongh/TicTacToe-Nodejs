@@ -112,6 +112,7 @@ body {
   margin: 20px;
   cursor: pointer;
   font-family: 'Ubuntu';
+  width: 160px;
 }
 
 .button:hover {
