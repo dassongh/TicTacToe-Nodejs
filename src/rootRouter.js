@@ -14,8 +14,9 @@ const routes = {
   '/login': renderLoginPage,
   '/register': renderRegisterPage,
   '/app.js': serveStatic,
-  '/app.css': serveStatic,
   '/login.js': serveStatic,
+  '/register.js': serveStatic,
+  '/app.css': serveStatic,
   '/api/user': userRouter,
   '/api/auth': authRouter,
 };

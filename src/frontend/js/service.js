@@ -10,6 +10,16 @@ export function login(data) {
   });
 }
 
+export function register(data) {
+  return fetch(`${BASE_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+}
+
 export function getCurrentUser(token) {
   return fetch(`${BASE_URL}/api/auth/current`, {
     method: 'GET',
