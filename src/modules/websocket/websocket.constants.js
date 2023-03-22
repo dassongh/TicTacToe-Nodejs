@@ -1,4 +1,4 @@
-const Action_Types = {
+const ACTION_TYPES = {
   ERROR: 'ERROR',
   FIND: 'FIND',
   CREATE: 'CREATE',
@@ -8,4 +8,4 @@ const Action_Types = {
   JOINED: 'JOINED',
 };
 
-module.exports = { Action_Types };
+module.exports = { ACTION_TYPES };

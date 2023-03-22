@@ -1,6 +1,6 @@
-const Token_Types = {
+const TOKEN_TYPES = {
   ACCESS: 'ACCESS',
   REFRESH: 'REFRESH',
 };
 
-module.exports = { Token_Types };
+module.exports = { TOKEN_TYPES };

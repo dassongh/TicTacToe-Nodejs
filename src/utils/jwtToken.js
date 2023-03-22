@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const { Token_Types } = require('../modules/auth/auth.constants');
+const { TOKEN_TYPES } = require('../modules/auth/auth.constants');
 const {
   ACCESS_TOKEN_EXPIRE,
   ACCESS_TOKEN_SALT,
@@ -9,13 +9,13 @@ const {
 } = require('../config');
 
 function createToken(userData, tokenType) {
-  const salt = tokenType === Token_Types.ACCESS ? ACCESS_TOKEN_SALT : REFRESH_TOKEN_SALT;
-  const expiresIn = tokenType === Token_Types.ACCESS ? ACCESS_TOKEN_EXPIRE : REFRESH_TOKEN_EXPIRE;
+  const salt = tokenType === TOKEN_TYPES.ACCESS ? ACCESS_TOKEN_SALT : REFRESH_TOKEN_SALT;
+  const expiresIn = tokenType === TOKEN_TYPES.ACCESS ? ACCESS_TOKEN_EXPIRE : REFRESH_TOKEN_EXPIRE;
   return jwt.sign(userData, salt, { expiresIn });
 }
 
 function verifyToken(token, tokenType) {
-  const salt = tokenType === Token_Types.ACCESS ? ACCESS_TOKEN_SALT : REFRESH_TOKEN_SALT;
+  const salt = tokenType === TOKEN_TYPES.ACCESS ? ACCESS_TOKEN_SALT : REFRESH_TOKEN_SALT;
   return jwt.verify(token, salt);
 }
 

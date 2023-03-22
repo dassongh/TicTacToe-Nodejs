@@ -5,7 +5,7 @@ const { WebSocketServer } = require('ws');
 const redis = require('../../db/redis');
 const authenticate = require('../../utils/authenticate');
 const { webSocketError, customError } = require('../../utils/webSocketError');
-const { Action_Types } = require('./websocket.constants');
+const { ACTION_TYPES } = require('./websocket.constants');
 
 function WebSocket(options) {
   this.wss = new WebSocketServer(options);
@@ -39,8 +39,8 @@ function WebSocket(options) {
   });
 
   const actionHandler = {
-    [Action_Types.CREATE]: createRoom,
-    [Action_Types.JOIN]: joinRoom,
+    [ACTION_TYPES.CREATE]: createRoom,
+    [ACTION_TYPES.JOIN]: joinRoom,
   };
 
   async function createRoom(socket) {
@@ -55,7 +55,7 @@ function WebSocket(options) {
     } catch (err) {
       return webSocketError(socket, err);
     }
-    const response = JSON.stringify({ action: Action_Types.CREATED, roomId });
+    const response = JSON.stringify({ action: ACTION_TYPES.CREATED, roomId });
     return socket.send(response);
   }
 
@@ -85,10 +85,10 @@ function WebSocket(options) {
     }
 
     let response;
-    response = JSON.stringify({ action: Action_Types.JOINED });
+    response = JSON.stringify({ action: ACTION_TYPES.JOINED });
     socket.send(response);
     if (players.length === 2) {
-      response = JSON.stringify({ action: Action_Types.GAME_START });
+      response = JSON.stringify({ action: ACTION_TYPES.GAME_START });
       players.forEach(player => {
         this.wss.clients.forEach(client => {
           if (client.id !== player) return;

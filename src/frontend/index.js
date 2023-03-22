@@ -1,2 +1,3 @@
-import './styles.css';
-import './js/modal';
+import './css/styles.css';
+import './js/main/loginBtnHandler';
+import './js/main/registerBtnHandler';

@@ -7,26 +7,33 @@
     <title>Document</title>
   </head>
   <body>
-    <section>
-      <div class="container">
-        <h1 class="welcome-heading">Welcome!</h1>
-        <p class="welcome-paragraph">Login or register to enjoy the game</p>
-        <button id="loginBtn" class="welcome-button">Login</button>
-        <button id="registerBtn" class="welcome-button">Register</button>
-        <h1 class="game--title">Tic-Tac-Toe</h1>
-        <div class="game--container">
-          <div data-cell-index="0" class="cell"></div>
-          <div data-cell-index="1" class="cell"></div>
-          <div data-cell-index="2" class="cell"></div>
-          <div data-cell-index="3" class="cell"></div>
-          <div data-cell-index="4" class="cell"></div>
-          <div data-cell-index="5" class="cell"></div>
-          <div data-cell-index="6" class="cell"></div>
-          <div data-cell-index="7" class="cell"></div>
-          <div data-cell-index="8" class="cell"></div>
+    <section class="main">
+      <div class="game-title">
+        <div class="neon">TicTac</div>
+        <div class="flux">Toe</div>
+      </div>
+      <div class="main-container">
+        <aside>
+          <div class="buttons">
+            <button id="loginBtn" class="button">Login</button>
+            <button id="registerBtn" class="button">Register</button>
+          </div>
+          <div id="user-data" class="user-data"></div>
+        </aside>
+
+        <div class="game-container">
+          <div class="board">
+            <div data-cell-index="0" class="cell">X</div>
+            <div data-cell-index="1" class="cell">O</div>
+            <div data-cell-index="2" class="cell"></div>
+            <div data-cell-index="3" class="cell"></div>
+            <div data-cell-index="4" class="cell"></div>
+            <div data-cell-index="5" class="cell"></div>
+            <div data-cell-index="6" class="cell"></div>
+            <div data-cell-index="7" class="cell"></div>
+            <div data-cell-index="8" class="cell"></div>
+          </div>
         </div>
-        <h2 class="game--status"></h2>
-        <button class="game--restart">Restart Game</button>
       </div>
     </section>
   </body>

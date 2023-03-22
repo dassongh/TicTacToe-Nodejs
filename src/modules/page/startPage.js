@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs/promises');
 
-async function renderStartPage(req, res) {
+module.exports = async function renderStartPage(req, res) {
   const filePath = path.resolve(__dirname, '../../../dist/index.html');
 
   let page;
@@ -13,6 +13,4 @@ async function renderStartPage(req, res) {
 
   res.writeHead(200, { 'Content-Type': 'text/html' });
   res.end(page, 'utf8');
-}
-
-module.exports = renderStartPage;
+};

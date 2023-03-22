@@ -16,7 +16,7 @@ const routes = {
   },
 };
 
-async function authRouter(req, res) {
+module.exports = async function authRouter(req, res) {
   let userUrl = req.url.replace('/api/auth', '');
   if (!userUrl) {
     userUrl = '/';
@@ -37,6 +37,4 @@ async function authRouter(req, res) {
     return httpError(res, 404, 'Not found');
   }
   routes[match.route][req.method](req, res);
-}
-
-module.exports = authRouter;
+};

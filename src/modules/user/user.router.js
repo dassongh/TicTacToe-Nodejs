@@ -18,7 +18,7 @@ const routes = {
   },
 };
 
-async function userRouter(req, res) {
+module.exports = async function userRouter(req, res) {
   let userUrl = req.url.replace('/api/user', '');
   if (!userUrl) {
     userUrl = '/';
@@ -38,6 +38,4 @@ async function userRouter(req, res) {
     return httpError(res, 404, 'Not found');
   }
   routes[match.route][req.method](req, res);
-}
-
-module.exports = userRouter;
+};

@@ -1,14 +1,14 @@
-const { Action_Types } = require('../modules/websocket/websocket.constants');
+const { ACTION_TYPES } = require('../modules/websocket/websocket.constants');
 
 function webSocketError(socket, error) {
   console.error(error);
-  socket.send(JSON.stringify({ action: Action_Types.ERROR, message: error.message }));
+  socket.send(JSON.stringify({ action: ACTION_TYPES.ERROR, message: error.message }));
   socket.close();
 }
 
 function customError(socket, message) {
   const errMessage = JSON.stringify({
-    action: Action_Types.ERROR,
+    action: ACTION_TYPES.ERROR,
     message,
   });
   socket.send(errMessage);
