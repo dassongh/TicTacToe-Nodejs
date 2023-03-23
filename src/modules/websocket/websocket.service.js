@@ -11,7 +11,7 @@ function WebSocket(options) {
   this.wss = new WebSocketServer(options);
   this.wss.on('connection', async (socket, request) => {
     try {
-      await authenticate(request);
+      await authenticate(request, true);
     } catch (err) {
       console.error(err);
     }
@@ -19,7 +19,7 @@ function WebSocket(options) {
     if (!request.user) {
       return webSocketError(socket, 'Unauthorized');
     }
-    const userId = request.user.userId;
+    // const userId = request.user.userId;
     socket.id = randomUUID();
     console.log('connected');
 
@@ -99,8 +99,6 @@ function WebSocket(options) {
   }
 }
 
-WebSocket.init = function (options) {
-  return new WebSocket(options);
-};
+WebSocket.init = options => new WebSocket(options);
 
 module.exports = WebSocket;

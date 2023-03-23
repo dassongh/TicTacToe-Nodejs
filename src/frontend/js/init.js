@@ -1,6 +1,8 @@
+import { WEB_SOCKET_URL } from './constants';
 import { addAuthButtonsListeners, addGameButtonsListeners } from './main/addButtonsListeners';
 import { renderWithoutToken, renderWithToken } from './main/render';
 import { getCurrentUser } from './service';
+import { WebSocketService } from './webSocketService';
 
 (async () => {
   const accessToken = localStorage.getItem('accessToken');
@@ -21,4 +23,7 @@ import { getCurrentUser } from './service';
 
   renderWithToken(user.data.nickname);
   addGameButtonsListeners(accessToken);
+
+  const connectionUrl = `${WEB_SOCKET_URL}?token=${accessToken}`;
+  WebSocketService.init(connectionUrl);
 })();

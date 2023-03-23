@@ -12,4 +12,5 @@ export function addAuthButtonsListeners() {
 
 export function addGameButtonsListeners(token) {
   document.getElementById('logoutBtn').addEventListener('click', logoutUser(token));
+  // document.getElementById('createBtn').addEventListener('click',)
 }

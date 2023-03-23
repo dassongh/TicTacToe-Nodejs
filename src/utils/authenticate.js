@@ -2,16 +2,10 @@ const { verifyToken } = require('./jwtToken');
 const { TOKEN_TYPES } = require('../modules/auth/auth.constants');
 const sessionService = require('../modules/auth/auth.service');
 
-function getTokenFromHeader(headers) {
-  const [type, token] = headers.authorization ? headers.authorization.split(' ') : [];
-  if (type === 'Bearer') return token;
-  return null;
-}
-
-module.exports = async function authenticate(req) {
-  const token = getTokenFromHeader(req.headers);
+module.exports = async function authenticate(req, isTokenFromQuery) {
+  const token = isTokenFromQuery ? getTokenFromQuery(req.url) : getTokenFromHeader(req.headers);
   req.user = null;
-
+  console.log(token);
   if (!token) return;
 
   let tokenInfo;
@@ -32,3 +26,13 @@ module.exports = async function authenticate(req) {
   req.user = { userId: tokenInfo.userId };
   return;
 };
+
+function getTokenFromHeader(headers) {
+  const [type, token] = headers.authorization ? headers.authorization.split(' ') : [];
+  if (type === 'Bearer') return token;
+  return null;
+}
+
+function getTokenFromQuery(url) {
+  return url.split('=')[1];
+}

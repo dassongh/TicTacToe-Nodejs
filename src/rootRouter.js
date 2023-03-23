@@ -23,17 +23,17 @@ const routes = {
 
 module.exports = async function rootRouter(req, res) {
   const route = findRoute(req.url, routes);
-  if (req.method === 'OPTIONS') {
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Max-Age': 2592000,
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    };
+  // if (req.method === 'OPTIONS') {
+  //   const headers = {
+  //     'Access-Control-Allow-Origin': '*',
+  //     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  //     'Access-Control-Max-Age': 2592000,
+  //     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  //   };
 
-    res.writeHead(204, headers);
-    return res.end();
-  }
+  //   res.writeHead(204, headers);
+  //   return res.end();
+  // }
 
   try {
     await authenticate(req);
