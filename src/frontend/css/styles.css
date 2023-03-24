@@ -141,3 +141,57 @@ body {
 .form input:last-child{
   margin-bottom: 0;
 }
+
+.modal-overlay {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  opacity: 1;
+}
+
+.modal-overlay-is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal {
+  position: absolute;
+  width: 450px;
+  height: 180px;
+  top: 50%;
+  left: 50%;
+  background-color: #11213a;
+  transform: translate(-50%, -50%) scale(1);
+  box-shadow: 0 0 50px #fff, -10px 0 80px #f0f, 10px 0 80px #0ff;
+  border-radius: 10px;
+}
+
+.modal-overlay-is-hidden .modal {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.modal-close-button {
+  font-size: 24px;
+  position: relative;
+  left: 200px;
+  top: 10px;
+  height: 30px;
+  width: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  background-color: #10435c;
+  color: #0ff;
+  cursor: pointer;
+}
+
+.modal-text {
+  margin-top: 30px;
+}
+
+.modal span {
+  color: #e316fa;
+}

@@ -5,7 +5,6 @@ const sessionService = require('../modules/auth/auth.service');
 module.exports = async function authenticate(req, isTokenFromQuery) {
   const token = isTokenFromQuery ? getTokenFromQuery(req.url) : getTokenFromHeader(req.headers);
   req.user = null;
-  console.log(token);
   if (!token) return;
 
   let tokenInfo;

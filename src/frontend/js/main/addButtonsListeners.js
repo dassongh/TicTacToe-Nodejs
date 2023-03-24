@@ -1,5 +1,6 @@
 import { logoutUser } from '../auth/logoutUser';
 import { BASE_URL } from '../constants';
+import { WebSocketService } from '../webSocketService';
 
 export function addAuthButtonsListeners() {
   document.getElementById('loginBtn').addEventListener('click', () => {
@@ -12,5 +13,8 @@ export function addAuthButtonsListeners() {
 
 export function addGameButtonsListeners(token) {
   document.getElementById('logoutBtn').addEventListener('click', logoutUser(token));
-  // document.getElementById('createBtn').addEventListener('click',)
+  document.getElementById('createBtn').addEventListener('click', () => {
+    const ws = WebSocketService.getInstance();
+    ws.createGame();
+  });
 }

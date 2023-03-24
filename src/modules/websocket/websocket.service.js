@@ -31,6 +31,11 @@ function WebSocket(options) {
         return webSocketError(socket, err);
       }
 
+      if (!actionHandler[parsedData.action]) {
+        console.log(parsedData);
+        return;
+      }
+
       actionHandler[parsedData.action].call(this, socket, parsedData);
     });
   });
