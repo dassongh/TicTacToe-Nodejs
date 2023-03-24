@@ -14,7 +14,10 @@ export function addAuthButtonsListeners() {
 export function addGameButtonsListeners(token) {
   document.getElementById('logoutBtn').addEventListener('click', logoutUser(token));
   document.getElementById('createBtn').addEventListener('click', () => {
-    const ws = WebSocketService.getInstance();
-    ws.createGame();
+    WebSocketService.getInstance().createGame();
+  });
+  document.getElementById('joinBtn').addEventListener('click', () => {
+    const roomId = prompt('Enter your room id');
+    WebSocketService.getInstance().joinGame(roomId);
   });
 }

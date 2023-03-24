@@ -19,11 +19,13 @@ export function WebSocketService(url) {
 
   this.socket.onclose = event => {
     if (event.wasClean) alert('Clean disconnect');
-    else alert('Missed connection');
+    // else alert('Missed connection');
   };
 
   const actionHandler = {
     [ACTION_TYPES.CREATED]: logCreatedRoom,
+    [ACTION_TYPES.JOINED]: waitForGameToStart,
+    [ACTION_TYPES.GAME_START]: gameStart,
   };
 
   function logCreatedRoom(data) {
@@ -44,6 +46,33 @@ export function WebSocketService(url) {
       nodesToRemove.forEach(node => node.remove());
     });
   }
+
+  function waitForGameToStart() {
+    const refs = {
+      board: document.getElementById('board'),
+      userDiv: document.getElementById('user-data'),
+      buttons: document.getElementById('game-buttons'),
+    };
+    refs.board.classList.add('board-animated');
+    refs.buttons.remove();
+    refs.userDiv.innerHTML = '<p>Waiting for another user to connect</p>';
+  }
+
+  function gameStart() {
+    const refs = {
+      board: document.getElementById('board'),
+      userDiv: document.getElementById('user-data'),
+    };
+    const buttonHTML = `
+      <div id="game-buttons" class="buttons">
+        <button id="leaveGame" class="button">Leave game</button>
+      </div>
+    `;
+    refs.userDiv.innerHTML = '<p>Turn</p>';
+    refs.userDiv.insertAdjacentHTML('afterend', buttonHTML);
+    refs.board.classList.remove('board-animated');
+    refs.board.childNodes.forEach(node => (node.innerHTML = ''));
+  }
 }
 
 WebSocketService.init = function (url) {
@@ -56,5 +85,10 @@ WebSocketService.getInstance = function () {
 
 WebSocketService.prototype.createGame = function () {
   const message = { action: ACTION_TYPES.CREATE };
+  this.socket.send(JSON.stringify(message));
+};
+
+WebSocketService.prototype.joinGame = function (roomId) {
+  const message = { action: ACTION_TYPES.JOIN, roomId };
   this.socket.send(JSON.stringify(message));
 };

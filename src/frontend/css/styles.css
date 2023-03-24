@@ -105,6 +105,10 @@ body {
   border-radius: 10px;
 }
 
+.board-animated {
+  animation: pulse 2s infinite;
+}
+
 .board :nth-child(1) {
   border-top-left-radius: 10px;
 }
@@ -119,6 +123,24 @@ body {
 
 .board :nth-child(9) {
   border-bottom-right-radius: 10px;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 30px #fff, -10px 0 60px #f0f, 10px 0 60px #0ff;
+  }
+  25% {
+    box-shadow: 0 0 40px #fff, -15px 0 80px #f0f, 15px 0 80px #0ff;
+  }
+  50% {
+    box-shadow: 0 0 50px #fff, -20px 0 100px #f0f, 20px 0 100px #0ff;
+  }
+  75% {
+    box-shadow: 0 0 40px #fff, -15px 0 80px #f0f, 15px 0 80px #0ff;
+  }
+  100% {
+    box-shadow: 0 0 30px #fff, -10px 0 60px #f0f, 10px 0 60px #0ff;
+  }
 }
 
 .form {
@@ -150,6 +172,7 @@ body {
   left: 0;
   background-color: rgba(0, 0, 0, 0.9);
   opacity: 1;
+  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-overlay-is-hidden {
@@ -168,6 +191,7 @@ body {
   transform: translate(-50%, -50%) scale(1);
   box-shadow: 0 0 50px #fff, -10px 0 80px #f0f, 10px 0 80px #0ff;
   border-radius: 10px;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .modal-overlay-is-hidden .modal {
