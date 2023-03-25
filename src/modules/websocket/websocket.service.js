@@ -4,6 +4,7 @@ const { WebSocketServer } = require('ws');
 // const userService = require('../user/user.service');
 const redis = require('../../db/redis');
 const authenticate = require('../../utils/authenticate');
+const { handleResultValidation, GAME_STATUS } = require('../../utils/game');
 const { webSocketError, customError } = require('../../utils/webSocketError');
 const { ACTION_TYPES } = require('./websocket.constants');
 
@@ -46,13 +47,16 @@ function WebSocket(options) {
   const actionHandler = {
     [ACTION_TYPES.CREATE]: createRoom,
     [ACTION_TYPES.JOIN]: joinRoom,
+    [ACTION_TYPES.PLAYER_TURN]: handlePlayerTurn,
   };
 
   async function createRoom(socket) {
     const roomId = randomUUID();
+    const playerTurn = Math.round(Math.random());
     const roomData = {
       players: JSON.stringify([]),
-      gameState: JSON.stringify([0, 0, 0, 0, 0, 0, 0, 0, 0]),
+      playerTurn,
+      gameState: JSON.stringify([-1, -1, -1, -1, -1, -1, -1, -1, -1]),
     };
 
     try {
@@ -64,10 +68,10 @@ function WebSocket(options) {
     return socket.send(response);
   }
 
-  async function joinRoom(socket, data) {
+  async function joinRoom(socket, { roomId }) {
     let room;
     try {
-      room = await redis.hGetAll(data.roomId);
+      room = await redis.hGetAll(roomId);
     } catch (err) {
       return webSocketError(socket, err);
     }
@@ -84,7 +88,7 @@ function WebSocket(options) {
     players.push(socket.id);
     const updatePayload = { players: JSON.stringify(players) };
     try {
-      await redis.hSet(data.roomId, updatePayload);
+      await redis.hSet(roomId, updatePayload);
     } catch (err) {
       return webSocketError(socket, err);
     }
@@ -93,7 +97,10 @@ function WebSocket(options) {
     response = JSON.stringify({ action: ACTION_TYPES.JOINED });
     socket.send(response);
     if (players.length === 2) {
-      response = JSON.stringify({ action: ACTION_TYPES.GAME_START });
+      response = JSON.stringify({
+        action: ACTION_TYPES.GAME_START,
+        playerTurn: room.playerTurn,
+      });
       players.forEach(player => {
         this.wss.clients.forEach(client => {
           if (client.id !== player) return;
@@ -101,6 +108,44 @@ function WebSocket(options) {
         });
       });
     }
+  }
+
+  async function handlePlayerTurn(socket, { roomId, playedCell }) {
+    let room;
+    try {
+      room = await redis.hGetAll(roomId);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    const newState = Array.from(JSON.parse(room.gameState));
+    newState[playedCell] = Number(room.playerTurn);
+
+    const updatePayload = {
+      gameState: JSON.stringify(newState),
+      playerTurn: Number(room.playerTurn) === 0 ? 1 : 0,
+    };
+    try {
+      await redis.hSet(roomId, updatePayload);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    const gameStatus = handleResultValidation(newState);
+
+    const response = JSON.stringify({
+      action: ACTION_TYPES.STATE_UPDATED,
+      gameState: newState,
+      gameStatus,
+      playerTurn: updatePayload.playerTurn,
+    });
+    const players = JSON.parse(room.players);
+    players.forEach(player => {
+      this.wss.clients.forEach(client => {
+        if (client.id !== player) return;
+        client.send(response);
+      });
+    });
   }
 }
 

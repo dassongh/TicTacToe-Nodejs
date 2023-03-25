@@ -1,3 +1,4 @@
+const { REDIS_HASH_TIME_TO_LIVE } = require('../config');
 const redisClient = require('./redisClient');
 
 function set(key, value) {
@@ -8,8 +9,8 @@ function get(key) {
   return redisClient.get(key);
 }
 
-function hSet(...args) {
-  return redisClient.hSet(...args);
+function hSet(key, values) {
+  return redisClient.hSet(key, values).then(() => redisClient.expire(key, REDIS_HASH_TIME_TO_LIVE));
 }
 
 function hGetAll(key) {

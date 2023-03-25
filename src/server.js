@@ -1,5 +1,4 @@
 const http = require('http');
-const { WebSocketServer } = require('ws');
 
 const { PORT } = require('./config');
 const rootRouter = require('./rootRouter');
