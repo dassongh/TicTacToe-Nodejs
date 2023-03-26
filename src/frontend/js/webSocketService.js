@@ -28,14 +28,14 @@ export function WebSocketService(url) {
     [ACTION_TYPES.GAME_START]: gameStart,
   };
 
-  function logCreatedRoom(data) {
+  function logCreatedRoom({ roomId }) {
     const refs = {
       closeModalBtn: document.getElementById('modalBtn'),
       modalOverlay: document.getElementById('modalOverlay'),
       modal: document.getElementById('modal'),
     };
     const html = `
-      <p class="modal-text">Your room id is "<span>${data.roomId}</span>"</p>
+      <p class="modal-text">Your room id is "<span>${roomId}</span>"</p>
       <p>Use it to join a game and send it to your friend</p>
     `;
     refs.modal.insertAdjacentHTML('beforeend', html);
@@ -58,7 +58,7 @@ export function WebSocketService(url) {
     refs.userDiv.innerHTML = '<p>Waiting for another user to connect</p>';
   }
 
-  function gameStart() {
+  function gameStart({ playerTurn }) {
     const refs = {
       board: document.getElementById('board'),
       userDiv: document.getElementById('user-data'),

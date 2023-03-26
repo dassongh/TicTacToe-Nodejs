@@ -1,7 +1,7 @@
 const { randomUUID } = require('crypto');
 const { WebSocketServer } = require('ws');
 
-// const userService = require('../user/user.service');
+const userService = require('../user/user.service');
 const redis = require('../../db/redis');
 const authenticate = require('../../utils/authenticate');
 const { handleResultValidation, GAME_STATUS } = require('../../utils/game');
@@ -9,7 +9,9 @@ const { webSocketError, customError } = require('../../utils/webSocketError');
 const { ACTION_TYPES } = require('./websocket.constants');
 
 function WebSocket(options) {
+  this.user = null;
   this.wss = new WebSocketServer(options);
+
   this.wss.on('connection', async (socket, request) => {
     try {
       await authenticate(request, true);
@@ -18,9 +20,17 @@ function WebSocket(options) {
     }
 
     if (!request.user) {
-      return webSocketError(socket, 'Unauthorized');
+      return customError(socket, 'Unauthorized');
     }
-    // const userId = request.user.userId;
+
+    let dbResult;
+    try {
+      dbResult = await userService.getById(request.user.userId, 'id, nickname');
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+    this.user = dbResult.rows[0];
+
     socket.id = randomUUID();
     console.log('connected');
 
@@ -40,6 +50,7 @@ function WebSocket(options) {
       actionHandler[parsedData.action].call(this, socket, parsedData);
     });
   });
+
   this.wss.on('error', err => {
     console.error(err);
   });
@@ -54,6 +65,7 @@ function WebSocket(options) {
     const roomId = randomUUID();
     const playerTurn = Math.round(Math.random());
     const roomData = {
+      playersNicknames: JSON.stringify([]),
       players: JSON.stringify([]),
       playerTurn,
       gameState: JSON.stringify([-1, -1, -1, -1, -1, -1, -1, -1, -1]),
@@ -84,9 +96,15 @@ function WebSocket(options) {
     if (players.length === 2) {
       return customError(socket, 'Room is full');
     }
-
     players.push(socket.id);
-    const updatePayload = { players: JSON.stringify(players) };
+
+    const playersNicknames = JSON.parse(room.playersNicknames);
+    playersNicknames.push(this.user.nickname);
+
+    const updatePayload = {
+      players: JSON.stringify(players),
+      playersNicknames: JSON.stringify(playersNicknames),
+    };
     try {
       await redis.hSet(roomId, updatePayload);
     } catch (err) {
