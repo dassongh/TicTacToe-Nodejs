@@ -12,3 +12,9 @@ export const ACTION_TYPES = {
   STATE_UPDATED: 'STATE_UPDATED',
   NEW_TURN: 'NEW_TURN',
 };
+
+export const GAME_STATUS = {
+  WIN: 'WIN',
+  DRAW: 'DRAW',
+  PLAYING: 'PLAYING',
+};

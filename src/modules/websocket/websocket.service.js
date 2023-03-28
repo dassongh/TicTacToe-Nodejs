@@ -122,7 +122,6 @@ function WebSocket(options) {
         playersNicknames,
         playerTurn: Number(room.playerTurn),
       });
-
       players.forEach(player => {
         this.wss.clients.forEach(client => {
           if (client.id !== player) return;
@@ -152,7 +151,7 @@ function WebSocket(options) {
     } catch (err) {
       return webSocketError(socket, err);
     }
-    console.log(updatePayload);
+
     const gameStatus = handleResultValidation(newState);
 
     const response = JSON.stringify({
@@ -162,7 +161,6 @@ function WebSocket(options) {
       playerTurn: updatePayload.playerTurn,
       playersNicknames: JSON.parse(room.playersNicknames),
     });
-
     const players = JSON.parse(room.players);
     players.forEach(player => {
       this.wss.clients.forEach(client => {

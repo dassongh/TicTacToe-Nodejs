@@ -1,4 +1,6 @@
-import { ACTION_TYPES } from './constants';
+import { ACTION_TYPES, GAME_STATUS } from './constants';
+import { addGameButtonsListeners } from './main/addButtonsListeners';
+import { renderWithToken } from './main/render';
 
 export function WebSocketService(url) {
   this.instance;
@@ -72,10 +74,18 @@ export function WebSocketService(url) {
     `;
     refs.userDiv.insertAdjacentHTML('afterend', buttonHTML);
 
+    // const leaveGameBtn = document.getElementById('leaveGame');
+    // leaveGameBtn.addEventListener('click', () => {
+    //   renderWithToken(localStorage.getItem('nickname'));
+    //   addGameButtonsListeners;
+    // });
+
     const nickname = localStorage.getItem('nickname');
     const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
     localStorage.setItem('isYourTurn', isYourTurn);
-    const turnMessage = isYourTurn ? 'It is your turn' : `It is ${playersNicknames[playerTurn]} turn`;
+    const turnMessage = isYourTurn
+      ? '<p>It is your turn</p>'
+      : `<p>It is ${playersNicknames[playerTurn]} turn</p>`;
     refs.userDiv.innerHTML = turnMessage;
 
     refs.board.classList.remove('board-animated');
@@ -91,11 +101,32 @@ export function WebSocketService(url) {
       userDiv: document.getElementById('user-data'),
     };
 
-    const nickname = localStorage.getItem('nickname');
-    const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
-    localStorage.setItem('isYourTurn', isYourTurn);
-    const turnMessage = isYourTurn ? 'It is your turn' : `It is ${playersNicknames[playerTurn]} turn`;
-    refs.userDiv.innerHTML = turnMessage;
+    let message;
+    if (gameStatus === GAME_STATUS.WIN) {
+      const winner = playersNicknames[playerTurn === 1 ? 0 : 1];
+      message = `<p>Player ${winner} wins!</p>`;
+
+      const btn = document.getElementById('leaveGame');
+      const btnHTML = '<button id="resetGame" class="button">Play again</button>';
+      btn.insertAdjacentHTML('beforebegin', btnHTML);
+    }
+
+    if (gameStatus === GAME_STATUS.DRAW) {
+      message = `<p>It is a draw</p>`;
+
+      const btn = document.getElementById('leaveGame');
+      const btnHTML = '<button id="resetGame" class="button">Play again</button>';
+      btn.insertAdjacentHTML('beforebegin', btnHTML);
+    }
+
+    if (gameStatus === GAME_STATUS.PLAYING) {
+      const nickname = localStorage.getItem('nickname');
+      const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
+      localStorage.setItem('isYourTurn', isYourTurn);
+      message = isYourTurn ? '<p>It is your turn</p>' : `<p>It is ${playersNicknames[playerTurn]} turn</p>`;
+    }
+
+    refs.userDiv.innerHTML = message;
 
     refs.cells.forEach(cell => {
       const cellIndex = Number(cell.getAttribute('data-cell-index'));
