@@ -8,6 +8,7 @@ const ACTION_TYPES = {
   JOINED: 'JOINED',
   PLAYER_TURN: 'PLAYER_TURN',
   STATE_UPDATED: 'STATE_UPDATED',
+  NEW_TURN: 'NEW_TURN',
 };
 
 module.exports = { ACTION_TYPES };

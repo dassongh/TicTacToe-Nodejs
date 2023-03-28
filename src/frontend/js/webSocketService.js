@@ -26,6 +26,7 @@ export function WebSocketService(url) {
     [ACTION_TYPES.CREATED]: logCreatedRoom,
     [ACTION_TYPES.JOINED]: waitForGameToStart,
     [ACTION_TYPES.GAME_START]: gameStart,
+    [ACTION_TYPES.STATE_UPDATED]: stateUpdated,
   };
 
   function logCreatedRoom({ roomId }) {
@@ -58,20 +59,66 @@ export function WebSocketService(url) {
     refs.userDiv.innerHTML = '<p>Waiting for another user to connect</p>';
   }
 
-  function gameStart({ playerTurn }) {
+  function gameStart({ playersNicknames, playerTurn }) {
     const refs = {
       board: document.getElementById('board'),
       userDiv: document.getElementById('user-data'),
     };
+
     const buttonHTML = `
       <div id="game-buttons" class="buttons">
         <button id="leaveGame" class="button">Leave game</button>
       </div>
     `;
-    refs.userDiv.innerHTML = '<p>Turn</p>';
     refs.userDiv.insertAdjacentHTML('afterend', buttonHTML);
+
+    const nickname = localStorage.getItem('nickname');
+    const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
+    localStorage.setItem('isYourTurn', isYourTurn);
+    const turnMessage = isYourTurn ? 'It is your turn' : `It is ${playersNicknames[playerTurn]} turn`;
+    refs.userDiv.innerHTML = turnMessage;
+
     refs.board.classList.remove('board-animated');
-    refs.board.childNodes.forEach(node => (node.innerHTML = ''));
+    refs.board.childNodes.forEach(node => {
+      node.innerHTML = '';
+      node.addEventListener('click', handleClick.bind(this));
+    });
+  }
+
+  function stateUpdated({ gameState, gameStatus, playerTurn, playersNicknames }) {
+    const refs = {
+      cells: document.querySelectorAll('.cell'),
+      userDiv: document.getElementById('user-data'),
+    };
+
+    const nickname = localStorage.getItem('nickname');
+    const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
+    localStorage.setItem('isYourTurn', isYourTurn);
+    const turnMessage = isYourTurn ? 'It is your turn' : `It is ${playersNicknames[playerTurn]} turn`;
+    refs.userDiv.innerHTML = turnMessage;
+
+    refs.cells.forEach(cell => {
+      const cellIndex = Number(cell.getAttribute('data-cell-index'));
+      gameState.forEach((el, index) => {
+        if (cellIndex !== index) return;
+        if (el === -1) cell.innerText = '';
+        if (el === 0) cell.innerText = 'O';
+        if (el === 1) cell.innerText = 'X';
+      });
+    });
+  }
+
+  function handleClick(event) {
+    const isYourTurn = Number(localStorage.getItem('isYourTurn'));
+    if (!isYourTurn) return;
+
+    const clickedCell = event.target;
+    const clickedCellIndex = Number(clickedCell.getAttribute('data-cell-index'));
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('roomId');
+
+    const message = { action: ACTION_TYPES.PLAYER_TURN, roomId, playedCell: clickedCellIndex };
+    this.socket.send(JSON.stringify(message));
   }
 }
 
@@ -89,6 +136,10 @@ WebSocketService.prototype.createGame = function () {
 };
 
 WebSocketService.prototype.joinGame = function (roomId) {
+  const params = new URLSearchParams(window.location.search);
+  params.set('roomId', roomId);
+  window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+
   const message = { action: ACTION_TYPES.JOIN, roomId };
   this.socket.send(JSON.stringify(message));
 };

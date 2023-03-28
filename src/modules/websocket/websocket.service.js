@@ -9,7 +9,6 @@ const { webSocketError, customError } = require('../../utils/webSocketError');
 const { ACTION_TYPES } = require('./websocket.constants');
 
 function WebSocket(options) {
-  this.user = null;
   this.wss = new WebSocketServer(options);
 
   this.wss.on('connection', async (socket, request) => {
@@ -23,15 +22,9 @@ function WebSocket(options) {
       return customError(socket, 'Unauthorized');
     }
 
-    let dbResult;
-    try {
-      dbResult = await userService.getById(request.user.userId, 'id, nickname');
-    } catch (err) {
-      return webSocketError(socket, err);
-    }
-    this.user = dbResult.rows[0];
-
     socket.id = randomUUID();
+    socket.userId = request.user.userId;
+
     console.log('connected');
 
     socket.on('message', async data => {
@@ -98,8 +91,16 @@ function WebSocket(options) {
     }
     players.push(socket.id);
 
+    let dbResult;
+    try {
+      dbResult = await userService.getById(socket.userId, 'id, nickname');
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+    const user = dbResult.rows[0];
+
     const playersNicknames = JSON.parse(room.playersNicknames);
-    playersNicknames.push(this.user.nickname);
+    playersNicknames.push(user.nickname);
 
     const updatePayload = {
       players: JSON.stringify(players),
@@ -114,11 +115,14 @@ function WebSocket(options) {
     let response;
     response = JSON.stringify({ action: ACTION_TYPES.JOINED });
     socket.send(response);
+
     if (players.length === 2) {
       response = JSON.stringify({
         action: ACTION_TYPES.GAME_START,
-        playerTurn: room.playerTurn,
+        playersNicknames,
+        playerTurn: Number(room.playerTurn),
       });
+
       players.forEach(player => {
         this.wss.clients.forEach(client => {
           if (client.id !== player) return;
@@ -148,7 +152,7 @@ function WebSocket(options) {
     } catch (err) {
       return webSocketError(socket, err);
     }
-
+    console.log(updatePayload);
     const gameStatus = handleResultValidation(newState);
 
     const response = JSON.stringify({
@@ -156,7 +160,9 @@ function WebSocket(options) {
       gameState: newState,
       gameStatus,
       playerTurn: updatePayload.playerTurn,
+      playersNicknames: JSON.parse(room.playersNicknames),
     });
+
     const players = JSON.parse(room.players);
     players.forEach(player => {
       this.wss.clients.forEach(client => {
