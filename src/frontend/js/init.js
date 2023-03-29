@@ -21,7 +21,7 @@ import { WebSocketService } from './webSocketService';
     return addAuthButtonsListeners();
   }
 
-  localStorage.setItem('nickname', user.data.nickname);
+  sessionStorage.setItem('nickname', user.data.nickname);
   renderWithToken(user.data.nickname);
   addGameButtonsListeners(accessToken);
 

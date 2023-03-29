@@ -8,7 +8,7 @@ export async function renderWithoutToken() {
     </div>
   `;
   userDiv.insertAdjacentHTML('beforebegin', authButtonsHtml);
-  userDiv.insertAdjacentHTML('afterbegin', html);
+  userDiv.innerHTML = html;
 }
 
 export async function renderWithToken(nickname) {
@@ -21,6 +21,6 @@ export async function renderWithToken(nickname) {
       <button id="logoutBtn" class="button">Logout</button>
     </div>
   `;
-  userDiv.insertAdjacentHTML('afterbegin', html);
+  userDiv.innerHTML = html;
   userDiv.insertAdjacentHTML('afterend', playButtonsHtml);
 }

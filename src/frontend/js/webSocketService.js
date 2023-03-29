@@ -29,6 +29,7 @@ export function WebSocketService(url) {
     [ACTION_TYPES.JOINED]: waitForGameToStart,
     [ACTION_TYPES.GAME_START]: gameStart,
     [ACTION_TYPES.STATE_UPDATED]: stateUpdated,
+    [ACTION_TYPES.GAME_LEFT]: gameLeft,
   };
 
   function logCreatedRoom({ roomId }) {
@@ -74,15 +75,12 @@ export function WebSocketService(url) {
     `;
     refs.userDiv.insertAdjacentHTML('afterend', buttonHTML);
 
-    // const leaveGameBtn = document.getElementById('leaveGame');
-    // leaveGameBtn.addEventListener('click', () => {
-    //   renderWithToken(localStorage.getItem('nickname'));
-    //   addGameButtonsListeners;
-    // });
+    const leaveGameBtn = document.getElementById('leaveGame');
+    leaveGameBtn.addEventListener('click', handleLeaveGameBtnClick.bind(this));
 
-    const nickname = localStorage.getItem('nickname');
+    const nickname = sessionStorage.getItem('nickname');
     const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
-    localStorage.setItem('isYourTurn', isYourTurn);
+    sessionStorage.setItem('isYourTurn', isYourTurn);
     const turnMessage = isYourTurn
       ? '<p>It is your turn</p>'
       : `<p>It is ${playersNicknames[playerTurn]} turn</p>`;
@@ -91,7 +89,7 @@ export function WebSocketService(url) {
     refs.board.classList.remove('board-animated');
     refs.board.childNodes.forEach(node => {
       node.innerHTML = '';
-      node.addEventListener('click', handleClick.bind(this));
+      node.addEventListener('click', handleCellClick.bind(this));
     });
   }
 
@@ -120,9 +118,9 @@ export function WebSocketService(url) {
     }
 
     if (gameStatus === GAME_STATUS.PLAYING) {
-      const nickname = localStorage.getItem('nickname');
+      const nickname = sessionStorage.getItem('nickname');
       const isYourTurn = playersNicknames[playerTurn] === nickname ? 1 : 0;
-      localStorage.setItem('isYourTurn', isYourTurn);
+      sessionStorage.setItem('isYourTurn', isYourTurn);
       message = isYourTurn ? '<p>It is your turn</p>' : `<p>It is ${playersNicknames[playerTurn]} turn</p>`;
     }
 
@@ -139,8 +137,15 @@ export function WebSocketService(url) {
     });
   }
 
-  function handleClick(event) {
-    const isYourTurn = Number(localStorage.getItem('isYourTurn'));
+  function gameLeft() {
+    alert('Your opponent left the game!');
+    document.getElementById('leaveGame').remove();
+    renderWithToken(sessionStorage.getItem('nickname'));
+    addGameButtonsListeners(localStorage.getItem('accessToken'));
+  }
+
+  function handleCellClick(event) {
+    const isYourTurn = Number(sessionStorage.getItem('isYourTurn'));
     if (!isYourTurn) return;
 
     const clickedCell = event.target;
@@ -148,8 +153,24 @@ export function WebSocketService(url) {
     const params = new URLSearchParams(window.location.search);
     const roomId = params.get('roomId');
 
-    const message = { action: ACTION_TYPES.PLAYER_TURN, roomId, playedCell: clickedCellIndex };
-    this.socket.send(JSON.stringify(message));
+    const message = JSON.stringify({
+      action: ACTION_TYPES.PLAYER_TURN,
+      roomId,
+      playedCell: clickedCellIndex,
+    });
+    this.socket.send(message);
+  }
+
+  function handleLeaveGameBtnClick(event) {
+    event.target.remove();
+    renderWithToken(sessionStorage.getItem('nickname'));
+    addGameButtonsListeners(localStorage.getItem('accessToken'));
+
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('roomId');
+    console.log(roomId);
+    const message = JSON.stringify({ action: ACTION_TYPES.LEAVE_GAME, roomId });
+    this.socket.send(message);
   }
 }
 

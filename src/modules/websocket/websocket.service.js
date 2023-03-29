@@ -52,6 +52,7 @@ function WebSocket(options) {
     [ACTION_TYPES.CREATE]: createRoom,
     [ACTION_TYPES.JOIN]: joinRoom,
     [ACTION_TYPES.PLAYER_TURN]: handlePlayerTurn,
+    [ACTION_TYPES.LEAVE_GAME]: leaveGame,
   };
 
   async function createRoom(socket) {
@@ -167,6 +168,43 @@ function WebSocket(options) {
         if (client.id !== player) return;
         client.send(response);
       });
+    });
+  }
+
+  async function leaveGame(socket, { roomId }) {
+    let room;
+    try {
+      room = await redis.hGetAll(roomId);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    let dbResult;
+    try {
+      dbResult = await userService.getById(socket.userId, 'id, nickname');
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+    const user = dbResult.rows[0];
+    // todo: check again
+
+    const updatedPlayers = JSON.parse(room.players).filter(player => player !== socket.id);
+    const updatedNicknames = JSON.parse(room.playersNicknames).filter(nickname => nickname !== user.nickname);
+
+    const updatePayload = {
+      players: JSON.stringify(updatedPlayers),
+      playersNicknames: JSON.stringify(updatedNicknames),
+    };
+    try {
+      await redis.hSet(roomId, updatePayload);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    const message = JSON.stringify({ action: ACTION_TYPES.GAME_LEFT });
+    this.wss.clients.forEach(client => {
+      if (client.id !== updatedPlayers[0]) return;
+      client.send(message);
     });
   }
 }
