@@ -18,6 +18,7 @@ export function addGameButtonsListeners(token) {
   });
   document.getElementById('joinBtn').addEventListener('click', () => {
     const roomId = prompt('Enter your room id');
+    if (!roomId) return;
     WebSocketService.getInstance().joinGame(roomId);
   });
 }

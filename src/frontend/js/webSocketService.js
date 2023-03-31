@@ -105,19 +105,19 @@ export function WebSocketService(url) {
       const winner = playersNicknames[playerTurn === 1 ? 0 : 1];
       message = `<p>Player ${winner} wins!</p>`;
 
-      const btn = document.getElementById('leaveGame');
-      const btnHTML = '<button id="resetGame" class="button">Play again</button>';
-      btn.insertAdjacentHTML('beforebegin', btnHTML);
-      document.getElementById('resetGame').addEventListener('click', handlePlayAgainBtnClick.bind(this));
+      const buttonContainer = document.getElementById('game-buttons');
+      const buttonHTML = '<button id="playAgainBtn" class="button">Play again</button>';
+      buttonContainer.insertAdjacentHTML('afterbegin', buttonHTML);
+      document.getElementById('playAgainBtn').addEventListener('click', handlePlayAgainBtnClick.bind(this));
     }
 
     if (gameStatus === GAME_STATUS.DRAW) {
       message = `<p>It is a draw</p>`;
 
-      const btn = document.getElementById('leaveGame');
-      const btnHTML = '<button id="resetGame" class="button">Play again</button>';
-      btn.insertAdjacentHTML('beforebegin', btnHTML);
-      document.getElementById('resetGame').addEventListener('click', handlePlayAgainBtnClick.bind(this));
+      const buttonContainer = document.getElementById('game-buttons');
+      const buttonHTML = '<button id="playAgainBtn" class="button">Play again</button>';
+      buttonContainer.insertAdjacentHTML('afterbegin', buttonHTML);
+      document.getElementById('playAgainBtn').addEventListener('click', handlePlayAgainBtnClick.bind(this));
     }
 
     if (gameStatus === GAME_STATUS.PLAYING) {
@@ -142,7 +142,8 @@ export function WebSocketService(url) {
 
   function gameLeft() {
     alert('Your opponent left the game!');
-    document.getElementById('leaveGame').remove();
+
+    document.getElementById('game-buttons').remove();
     renderWithToken(sessionStorage.getItem('nickname'));
     addGameButtonsListeners(localStorage.getItem('accessToken'));
   }
@@ -188,8 +189,9 @@ export function WebSocketService(url) {
     this.socket.send(message);
   }
 
-  function handleLeaveGameBtnClick(event) {
-    event.target.remove();
+  function handleLeaveGameBtnClick() {
+    document.getElementById('game-buttons').remove();
+
     renderWithToken(sessionStorage.getItem('nickname'));
     addGameButtonsListeners(localStorage.getItem('accessToken'));
 
