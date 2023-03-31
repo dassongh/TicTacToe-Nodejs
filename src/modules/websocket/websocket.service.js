@@ -39,7 +39,7 @@ function WebSocket(options) {
         console.log(parsedData);
         return;
       }
-
+      console.log(parsedData);
       actionHandler[parsedData.action].call(this, socket, parsedData);
     });
   });
@@ -53,6 +53,8 @@ function WebSocket(options) {
     [ACTION_TYPES.JOIN]: joinRoom,
     [ACTION_TYPES.PLAYER_TURN]: handlePlayerTurn,
     [ACTION_TYPES.LEAVE_GAME]: leaveGame,
+    [ACTION_TYPES.PLAY_AGAIN]: playAgain,
+    [ACTION_TYPES.RESET_GAME]: resetGame,
   };
 
   async function createRoom(socket) {
@@ -205,6 +207,59 @@ function WebSocket(options) {
     this.wss.clients.forEach(client => {
       if (client.id !== updatedPlayers[0]) return;
       client.send(message);
+    });
+  }
+
+  async function playAgain(socket, { roomId }) {
+    let room;
+    try {
+      room = await redis.hGetAll(roomId);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    const players = JSON.parse(room.players);
+    const oppositePlayer = players.filter(player => player !== socket.id);
+    this.wss.clients.forEach(client => {
+      if (client.id !== oppositePlayer[0]) return;
+      client.send(JSON.stringify({ action: ACTION_TYPES.PLAY_AGAIN }));
+    });
+  }
+
+  async function resetGame(socket, { roomId }) {
+    let room;
+    try {
+      room = await redis.hGetAll(roomId);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    const playerTurn = Math.round(Math.random());
+    const newGameState = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
+    const updatePayload = {
+      playerTurn,
+      gameState: JSON.stringify(newGameState),
+    };
+
+    try {
+      await redis.hSet(roomId, updatePayload);
+    } catch (err) {
+      return webSocketError(socket, err);
+    }
+
+    const response = JSON.stringify({
+      action: ACTION_TYPES.STATE_UPDATED,
+      gameState: newGameState,
+      gameStatus: GAME_STATUS.PLAYING,
+      playerTurn: playerTurn,
+      playersNicknames: JSON.parse(room.playersNicknames),
+    });
+    const players = JSON.parse(room.players);
+    players.forEach(player => {
+      this.wss.clients.forEach(client => {
+        if (client.id !== player) return;
+        client.send(response);
+      });
     });
   }
 }

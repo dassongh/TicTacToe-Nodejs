@@ -15,6 +15,8 @@ const ACCESS_TOKEN_EXPIRE = 60 * 60 * 24 * 1000;
 const REFRESH_TOKEN_EXPIRE = 60 * 60 * 24 * 30 * 1000;
 
 const REDIS_HASH_TIME_TO_LIVE = 7200;
+const REDIS_HOST = process.env.REDIS_HOST;
+const REDIS_PORT = process.env.REDIS_PORT;
 
 module.exports = {
   POSTGRES_DB,
@@ -29,4 +31,6 @@ module.exports = {
   ACCESS_TOKEN_EXPIRE,
   REFRESH_TOKEN_EXPIRE,
   REDIS_HASH_TIME_TO_LIVE,
+  REDIS_HOST,
+  REDIS_PORT,
 };

@@ -20,9 +20,9 @@ function count() {
 
 function create(payload) {
   const sql = `
-    INSERT INTO users(fullname, nickname, email, password)
+    INSERT INTO users(nickname, fullname, email, password)
     VALUES($1, $2, $3, $4)
-    RETURNING id, fullname, nickname, email
+    RETURNING id, nickname, fullname, email
   `;
   const params = Object.values(payload);
 

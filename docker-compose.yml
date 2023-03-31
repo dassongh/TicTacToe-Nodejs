@@ -9,9 +9,20 @@ services:
     container_name: 'server1'
     environment:
       - APPID=1
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=tictactoe
+      - POSTGRES_USER=superuser
+      - POSTGRES_PASSWORD=superpassword
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
     build: .
     ports:
       - "1111:1111"
+    depends_on:
+      - redis
+      - postgres
     networks:
       - app_network
 
@@ -19,9 +30,19 @@ services:
     container_name: 'server2'
     environment:
       - APPID=2
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=tictactoe
+      - POSTGRES_USER=superuser
+      - POSTGRES_PASSWORD=superpassword
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     build: .
     ports:
       - "2222:1111"
+    depends_on:
+      - redis
+      - postgres
     networks:
       - app_network
 

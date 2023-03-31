@@ -15,7 +15,7 @@ export function WebSocketService(url) {
       console.error(err);
       return;
     }
-
+    console.log(parsedData);
     actionHandler[parsedData.action].call(this, parsedData);
   };
 
@@ -30,6 +30,7 @@ export function WebSocketService(url) {
     [ACTION_TYPES.GAME_START]: gameStart,
     [ACTION_TYPES.STATE_UPDATED]: stateUpdated,
     [ACTION_TYPES.GAME_LEFT]: gameLeft,
+    [ACTION_TYPES.PLAY_AGAIN]: playAgain,
   };
 
   function logCreatedRoom({ roomId }) {
@@ -107,6 +108,7 @@ export function WebSocketService(url) {
       const btn = document.getElementById('leaveGame');
       const btnHTML = '<button id="resetGame" class="button">Play again</button>';
       btn.insertAdjacentHTML('beforebegin', btnHTML);
+      document.getElementById('resetGame').addEventListener('click', handlePlayAgainBtnClick.bind(this));
     }
 
     if (gameStatus === GAME_STATUS.DRAW) {
@@ -115,6 +117,7 @@ export function WebSocketService(url) {
       const btn = document.getElementById('leaveGame');
       const btnHTML = '<button id="resetGame" class="button">Play again</button>';
       btn.insertAdjacentHTML('beforebegin', btnHTML);
+      document.getElementById('resetGame').addEventListener('click', handlePlayAgainBtnClick.bind(this));
     }
 
     if (gameStatus === GAME_STATUS.PLAYING) {
@@ -144,6 +147,30 @@ export function WebSocketService(url) {
     addGameButtonsListeners(localStorage.getItem('accessToken'));
   }
 
+  function playAgain() {
+    const refs = {
+      closeModalBtn: document.getElementById('modalBtn'),
+      modalOverlay: document.getElementById('modalOverlay'),
+      modal: document.getElementById('modal'),
+    };
+
+    const html = `
+      <p class="modal-text">Your opponents wants to play again</p>
+      <button id="denyBtn" class="button">Deny</button>
+      <button id="acceptBtn" class="button">Accept</button>
+    `;
+    refs.modal.insertAdjacentHTML('beforeend', html);
+    refs.modalOverlay.classList.remove('modal-overlay-is-hidden');
+
+    const denyBtn = document.getElementById('denyBtn');
+    denyBtn.addEventListener('click', handleDenyGameBtnClick.bind(this));
+
+    const acceptBtn = document.getElementById('acceptBtn');
+    acceptBtn.addEventListener('click', handleAcceptGameBtnClick.bind(this));
+
+    refs.closeModalBtn.addEventListener('click', handleDenyGameBtnClick.bind(this));
+  }
+
   function handleCellClick(event) {
     const isYourTurn = Number(sessionStorage.getItem('isYourTurn'));
     if (!isYourTurn) return;
@@ -168,8 +195,42 @@ export function WebSocketService(url) {
 
     const params = new URLSearchParams(window.location.search);
     const roomId = params.get('roomId');
-    console.log(roomId);
     const message = JSON.stringify({ action: ACTION_TYPES.LEAVE_GAME, roomId });
+    this.socket.send(message);
+  }
+
+  function handleDenyGameBtnClick() {
+    const modalOverlay = document.getElementById('modalOverlay');
+    modalOverlay.classList.add('modal-overlay-is-hidden');
+
+    const modal = document.getElementById('modal');
+    const nodesToRemove = [...modal.childNodes].slice(2);
+    nodesToRemove.forEach(node => node.remove());
+
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('roomId');
+    const message = JSON.stringify({ action: ACTION_TYPES.LEAVE_GAME, roomId });
+    this.socket.send(message);
+  }
+
+  function handleAcceptGameBtnClick() {
+    const modalOverlay = document.getElementById('modalOverlay');
+    modalOverlay.classList.add('modal-overlay-is-hidden');
+
+    const modal = document.getElementById('modal');
+    const nodesToRemove = [...modal.childNodes].slice(2);
+    nodesToRemove.forEach(node => node.remove());
+
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('roomId');
+    const message = JSON.stringify({ action: ACTION_TYPES.RESET_GAME, roomId });
+    this.socket.send(message);
+  }
+
+  function handlePlayAgainBtnClick() {
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('roomId');
+    const message = JSON.stringify({ action: ACTION_TYPES.PLAY_AGAIN, roomId });
     this.socket.send(message);
   }
 }

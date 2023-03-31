@@ -19,7 +19,7 @@ async function register(userData, deviceId) {
   if (existedUser.rowCount) {
     throw new CustomError(400, 'User with such email already exist');
   }
-
+  console.log(userData);
   const passwordHash = _passwordCrypt(userData.password);
   const userPayload = Object.assign({}, userData, { password: passwordHash });
 
