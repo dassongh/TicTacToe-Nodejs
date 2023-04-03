@@ -39,7 +39,7 @@ function WebSocket(options) {
         console.log(parsedData);
         return;
       }
-      console.log(parsedData);
+
       actionHandler[parsedData.action].call(this, socket, parsedData);
     });
   });

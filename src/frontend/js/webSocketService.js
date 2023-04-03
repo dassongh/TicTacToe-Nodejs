@@ -1,6 +1,6 @@
 import { ACTION_TYPES, GAME_STATUS } from './constants';
 import { addGameButtonsListeners } from './main/addButtonsListeners';
-import { renderWithToken } from './main/render';
+import { renderBoard, renderWithToken } from './main/render';
 
 export function WebSocketService(url) {
   this.instance;
@@ -15,7 +15,7 @@ export function WebSocketService(url) {
       console.error(err);
       return;
     }
-    console.log(parsedData);
+
     actionHandler[parsedData.action].call(this, parsedData);
   };
 
@@ -88,6 +88,10 @@ export function WebSocketService(url) {
     refs.userDiv.innerHTML = turnMessage;
 
     refs.board.classList.remove('board-animated');
+
+    if (refs.board.getAttribute('isListenerAdded')) return;
+
+    refs.board.setAttribute('isListenerAdded', true);
     refs.board.childNodes.forEach(node => {
       node.innerHTML = '';
       node.addEventListener('click', handleCellClick.bind(this));
@@ -144,8 +148,11 @@ export function WebSocketService(url) {
     alert('Your opponent left the game!');
 
     document.getElementById('game-buttons').remove();
+    document.getElementById('board').remove();
+
     renderWithToken(sessionStorage.getItem('nickname'));
     addGameButtonsListeners(localStorage.getItem('accessToken'));
+    renderBoard();
   }
 
   function playAgain() {
@@ -153,7 +160,9 @@ export function WebSocketService(url) {
       closeModalBtn: document.getElementById('modalBtn'),
       modalOverlay: document.getElementById('modalOverlay'),
       modal: document.getElementById('modal'),
+      playAgainBtn: document.getElementById('playAgainBtn'),
     };
+    refs.playAgainBtn.remove();
 
     const html = `
       <p class="modal-text">Your opponents wants to play again</p>
@@ -191,9 +200,11 @@ export function WebSocketService(url) {
 
   function handleLeaveGameBtnClick() {
     document.getElementById('game-buttons').remove();
+    document.getElementById('board').remove();
 
     renderWithToken(sessionStorage.getItem('nickname'));
     addGameButtonsListeners(localStorage.getItem('accessToken'));
+    renderBoard();
 
     const params = new URLSearchParams(window.location.search);
     const roomId = params.get('roomId');
@@ -229,7 +240,8 @@ export function WebSocketService(url) {
     this.socket.send(message);
   }
 
-  function handlePlayAgainBtnClick() {
+  function handlePlayAgainBtnClick(event) {
+    event.target.remove();
     const params = new URLSearchParams(window.location.search);
     const roomId = params.get('roomId');
     const message = JSON.stringify({ action: ACTION_TYPES.PLAY_AGAIN, roomId });

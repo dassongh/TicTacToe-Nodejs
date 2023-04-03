@@ -29,6 +29,10 @@ function handleResultValidation(gameState) {
     }
   }
 
+  if (!gameState.includes(-1) && status !== GAME_STATUS.WIN) {
+    status = GAME_STATUS.DRAW;
+  }
+
   return status;
 }
 
