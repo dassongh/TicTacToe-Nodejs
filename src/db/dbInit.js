@@ -1,35 +1,37 @@
 const db = require('./index');
 
 const sql = `
-CREATE TABLE IF NOT EXISTS public.users
+CREATE TABLE IF NOT EXISTS users
 (
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-    fullname character varying(40) COLLATE pg_catalog."default" NOT NULL,
-    nickname character varying(40) COLLATE pg_catalog."default" NOT NULL,
-    email character varying(40) COLLATE pg_catalog."default" NOT NULL,
-    password character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    "socketId" character varying(40) COLLATE pg_catalog."default",
-    CONSTRAINT users_pkey PRIMARY KEY (id)
-)
+    id SERIAL PRIMARY KEY,
+    fullname character varying(40) NOT NULL,
+    nickname character varying(40) NOT NULL,
+    email character varying(40) NOT NULL,
+    password character varying(200) NOT NULL,
+    "socketId" character varying(40),
+    "isOnline" boolean NOT NULL DEFAULT false,
+    "totalGames" integer NOT NULL DEFAULT 0,
+    wins integer NOT NULL DEFAULT 0,
+    losses integer NOT NULL DEFAULT 0,
+    draws integer NOT NULL DEFAULT 0
+);
 
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.users
-    OWNER to superuser;
-
-CREATE TABLE IF NOT EXISTS public.sessions
+CREATE TABLE IF NOT EXISTS friends
 (
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     "userId" integer NOT NULL,
-    "deviceId" character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    "refreshToken" character varying(200) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT sessions_pkey PRIMARY KEY (id)
-)
+    "friendId" integer NOT NULL,
+    FOREIGN KEY ("userId") REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY ("friendId") REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY ("userId", "friendId")
+);
 
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.sessions
-    OWNER to superuser;
+CREATE TABLE IF NOT EXISTS sessions
+(
+    id SERIAL PRIMARY KEY,
+    "userId" integer NOT NULL,
+    "deviceId" character varying(100) NOT NULL,
+    "refreshToken" character varying(200) NOT NULL
+);
 `;
 
 module.exports = function initDb() {
