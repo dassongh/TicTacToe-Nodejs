@@ -71,6 +71,7 @@ function WebSocket(options) {
     } catch (err) {
       return webSocketError(socket, err);
     }
+
     const response = JSON.stringify({ action: ACTION_TYPES.CREATED, roomId });
     return socket.send(response);
   }

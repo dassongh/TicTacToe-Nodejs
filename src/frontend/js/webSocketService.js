@@ -1,6 +1,7 @@
 import { ACTION_TYPES, GAME_STATUS } from './constants';
 import { addGameButtonsListeners } from './main/addButtonsListeners';
-import { renderBoard, renderWithToken } from './main/render';
+import { renderBoard, renderLeaderboard, renderWithToken } from './main/render';
+import { getLeaderboard } from './service';
 
 export function WebSocketService(url) {
   this.instance;
@@ -57,9 +58,11 @@ export function WebSocketService(url) {
       board: document.getElementById('board'),
       userDiv: document.getElementById('user-data'),
       buttons: document.getElementById('game-buttons'),
+      leaderboard: document.getElementById('leaderboard'),
     };
     refs.board.classList.add('board-animated');
     refs.buttons.remove();
+    refs.leaderboard.remove();
     refs.userDiv.innerHTML = '<p>Waiting for another user to connect</p>';
   }
 
@@ -144,15 +147,26 @@ export function WebSocketService(url) {
     });
   }
 
-  function gameLeft() {
+  async function gameLeft() {
     alert('Your opponent left the game!');
 
     document.getElementById('game-buttons').remove();
     document.getElementById('board').remove();
 
+    const accessToken = localStorage.getItem('accessToken');
     renderWithToken(sessionStorage.getItem('nickname'));
-    addGameButtonsListeners(localStorage.getItem('accessToken'));
+    addGameButtonsListeners(accessToken);
     renderBoard();
+
+    let leaderboard;
+    try {
+      leaderboard = await getLeaderboard(accessToken).then(res => res.json());
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    renderLeaderboard(leaderboard.data);
   }
 
   function playAgain() {
@@ -198,13 +212,24 @@ export function WebSocketService(url) {
     this.socket.send(message);
   }
 
-  function handleLeaveGameBtnClick() {
+  async function handleLeaveGameBtnClick() {
     document.getElementById('game-buttons').remove();
     document.getElementById('board').remove();
 
+    const accessToken = localStorage.getItem('accessToken');
     renderWithToken(sessionStorage.getItem('nickname'));
-    addGameButtonsListeners(localStorage.getItem('accessToken'));
+    addGameButtonsListeners(accessToken);
     renderBoard();
+
+    let leaderboard;
+    try {
+      leaderboard = await getLeaderboard(accessToken).then(res => res.json());
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    renderLeaderboard(leaderboard.data);
 
     const params = new URLSearchParams(window.location.search);
     const roomId = params.get('roomId');

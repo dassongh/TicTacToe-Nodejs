@@ -219,3 +219,23 @@ body {
 .modal span {
   color: #e316fa;
 }
+
+.leaderboard {
+  margin-top: 50px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  background-color: #e316fa;
+  color: white;
+}

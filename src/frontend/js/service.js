@@ -37,3 +37,12 @@ export function logout(token) {
     },
   });
 }
+
+export function getLeaderboard(token) {
+  return fetch(`${BASE_URL}/api/leaderboard`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}

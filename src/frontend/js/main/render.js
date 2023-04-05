@@ -42,3 +42,41 @@ export function renderBoard() {
   `;
   container.insertAdjacentHTML('beforeend', boardHtml);
 }
+
+export function renderLeaderboard(leaderboard) {
+  const sidebar = document.getElementById('sidebar');
+  const html = `
+    <div class="leaderboard" id="leaderboard">
+      <h2>Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th>Nickname</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Draws</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${leaderboard
+            .map(
+              (user, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${user.nickname}</td>
+                  <td>${user.wins}</td>
+                  <td>${user.losses}</td>
+                  <td>${user.draws}</td>
+                  <td>${user.score}</td>
+                </tr>
+              `
+            )
+            .join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  sidebar.insertAdjacentHTML('beforeend', html);
+}

@@ -1,16 +1,15 @@
 import { WEB_SOCKET_URL } from './constants';
 import { addAuthButtonsListeners, addGameButtonsListeners } from './main/addButtonsListeners';
-import { renderWithoutToken, renderWithToken } from './main/render';
-import { getCurrentUser } from './service';
+import { renderLeaderboard, renderWithoutToken, renderWithToken } from './main/render';
+import { getCurrentUser, getLeaderboard } from './service';
 import { WebSocketService } from './webSocketService';
 
 (async () => {
   const accessToken = localStorage.getItem('accessToken');
 
-  let response, user;
+  let user;
   try {
-    response = await getCurrentUser(accessToken);
-    user = await response.json();
+    user = await getCurrentUser(accessToken).then(res => res.json());
   } catch (err) {
     console.error(err);
     return;
@@ -24,6 +23,16 @@ import { WebSocketService } from './webSocketService';
   sessionStorage.setItem('nickname', user.data.nickname);
   renderWithToken(user.data.nickname);
   addGameButtonsListeners(accessToken);
+
+  let leaderboard;
+  try {
+    leaderboard = await getLeaderboard(accessToken).then(res => res.json());
+  } catch (err) {
+    console.error(err);
+    return;
+  }
+
+  renderLeaderboard(leaderboard.data);
 
   const connectionUrl = `${WEB_SOCKET_URL}?token=${accessToken}`;
   WebSocketService.init(connectionUrl);
