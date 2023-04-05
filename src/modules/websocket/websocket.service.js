@@ -59,16 +59,15 @@ function WebSocket(options) {
 
   async function createRoom(socket) {
     const roomId = randomUUID();
-    const playerTurn = Math.round(Math.random());
     const roomData = {
-      playersNicknames: JSON.stringify([]),
-      players: JSON.stringify([]),
-      playerTurn,
-      gameState: JSON.stringify([-1, -1, -1, -1, -1, -1, -1, -1, -1]),
+      playersNicknames: [],
+      players: [],
+      playerTurn: Math.round(Math.random()),
+      gameState: [-1, -1, -1, -1, -1, -1, -1, -1, -1],
     };
 
     try {
-      await redis.hSet(roomId, roomData);
+      await redis.set(roomId, JSON.stringify(roomData));
     } catch (err) {
       return webSocketError(socket, err);
     }
@@ -77,40 +76,36 @@ function WebSocket(options) {
   }
 
   async function joinRoom(socket, { roomId }) {
-    let room;
+    let redisResponse;
     try {
-      room = await redis.hGetAll(roomId);
+      redisResponse = await redis.get(roomId);
     } catch (err) {
       return webSocketError(socket, err);
     }
 
-    if (!Object.keys(room).length) {
+    if (!redisResponse) {
       return customError(socket, 'Room not found');
     }
 
-    const players = JSON.parse(room.players);
-    if (players.length === 2) {
+    const room = JSON.parse(redisResponse);
+
+    if (room.length === 2) {
       return customError(socket, 'Room is full');
     }
-    players.push(socket.id);
+    room.players.push(socket.id);
 
-    let dbResult;
+    let dbResponse;
     try {
-      dbResult = await userService.getById(socket.userId, 'id, nickname');
+      dbResponse = await userService.getById(socket.userId, 'id, nickname');
     } catch (err) {
       return webSocketError(socket, err);
     }
-    const user = dbResult.rows[0];
+    const user = dbResponse.rows[0];
 
-    const playersNicknames = JSON.parse(room.playersNicknames);
-    playersNicknames.push(user.nickname);
+    room.playersNicknames.push(user.nickname);
 
-    const updatePayload = {
-      players: JSON.stringify(players),
-      playersNicknames: JSON.stringify(playersNicknames),
-    };
     try {
-      await redis.hSet(roomId, updatePayload);
+      await redis.set(roomId, JSON.stringify(room));
     } catch (err) {
       return webSocketError(socket, err);
     }
@@ -119,13 +114,13 @@ function WebSocket(options) {
     response = JSON.stringify({ action: ACTION_TYPES.JOINED });
     socket.send(response);
 
-    if (players.length === 2) {
+    if (room.players.length === 2) {
       response = JSON.stringify({
         action: ACTION_TYPES.GAME_START,
-        playersNicknames,
+        playersNicknames: room.playersNicknames,
         playerTurn: Number(room.playerTurn),
       });
-      players.forEach(player => {
+      room.players.forEach(player => {
         this.wss.clients.forEach(client => {
           if (client.id !== player) return;
           client.send(response);
@@ -135,31 +130,28 @@ function WebSocket(options) {
   }
 
   async function handlePlayerTurn(socket, { roomId, playedCell }) {
-    let room;
+    let redisResponse;
     try {
-      room = await redis.hGetAll(roomId);
+      redisResponse = await redis.get(roomId);
     } catch (err) {
       return webSocketError(socket, err);
     }
 
-    const newState = Array.from(JSON.parse(room.gameState));
-    newState[playedCell] = Number(room.playerTurn);
+    const room = JSON.parse(redisResponse);
 
-    const updatePayload = {
-      gameState: JSON.stringify(newState),
-      playerTurn: Number(room.playerTurn) === 0 ? 1 : 0,
-    };
+    room.gameState[playedCell] = Number(room.playerTurn);
+    room.playerTurn = Number(room.playerTurn) === 0 ? 1 : 0;
+
     try {
-      await redis.hSet(roomId, updatePayload);
+      await redis.set(roomId, JSON.stringify(room));
     } catch (err) {
       return webSocketError(socket, err);
     }
 
-    const gameStatus = handleResultValidation(newState);
+    const gameStatus = handleResultValidation(room.gameState);
 
-    const players = JSON.parse(room.players);
     const playersSockets = [];
-    players.forEach(player => {
+    room.players.forEach(player => {
       this.wss.clients.forEach(client => {
         if (client.id !== player) return;
         playersSockets.push(client);
@@ -179,7 +171,7 @@ function WebSocket(options) {
 
     if (gameStatus === GAME_STATUS.WIN) {
       const gameResult = playersSockets.reduce((result, socket) => {
-        if (socket.id !== players[updatePayload.playerTurn]) {
+        if (socket.id !== room.players[room.playerTurn]) {
           result.winnerId = socket.userId;
         } else {
           result.looserId = socket.userId;
@@ -199,61 +191,58 @@ function WebSocket(options) {
 
     const response = JSON.stringify({
       action: ACTION_TYPES.STATE_UPDATED,
-      gameState: newState,
+      gameState: room.gameState,
       gameStatus,
-      playerTurn: updatePayload.playerTurn,
-      playersNicknames: JSON.parse(room.playersNicknames),
+      playerTurn: room.playerTurn,
+      playersNicknames: room.playersNicknames,
     });
     playersSockets.forEach(socket => socket.send(response));
   }
 
   async function leaveGame(socket, { roomId }) {
-    let room;
+    let redisResponse;
     try {
-      room = await redis.hGetAll(roomId);
+      redisResponse = await redis.get(roomId);
     } catch (err) {
       return webSocketError(socket, err);
     }
+    const room = JSON.parse(redisResponse);
 
-    let dbResult;
+    let dbResponse;
     try {
-      dbResult = await userService.getById(socket.userId, 'id, nickname');
+      dbResponse = await userService.getById(socket.userId, 'id, nickname');
     } catch (err) {
       return webSocketError(socket, err);
     }
-    const user = dbResult.rows[0];
+    const user = dbResponse.rows[0];
     // todo: check again
 
-    const updatedPlayers = JSON.parse(room.players).filter(player => player !== socket.id);
-    const updatedNicknames = JSON.parse(room.playersNicknames).filter(nickname => nickname !== user.nickname);
+    room.players = room.players.filter(player => player !== socket.id);
+    room.playersNicknames = room.playersNicknames.filter(nickname => nickname !== user.nickname);
 
-    const updatePayload = {
-      players: JSON.stringify(updatedPlayers),
-      playersNicknames: JSON.stringify(updatedNicknames),
-    };
     try {
-      await redis.hSet(roomId, updatePayload);
+      await redis.set(roomId, JSON.stringify(room));
     } catch (err) {
       return webSocketError(socket, err);
     }
 
     const message = JSON.stringify({ action: ACTION_TYPES.GAME_LEFT });
     this.wss.clients.forEach(client => {
-      if (client.id !== updatedPlayers[0]) return;
+      if (client.id !== room.players[0]) return;
       client.send(message);
     });
   }
 
   async function playAgain(socket, { roomId }) {
-    let room;
+    let redisResponse;
     try {
-      room = await redis.hGetAll(roomId);
+      redisResponse = await redis.get(roomId);
     } catch (err) {
       return webSocketError(socket, err);
     }
+    const room = JSON.parse(redisResponse);
 
-    const players = JSON.parse(room.players);
-    const oppositePlayer = players.filter(player => player !== socket.id);
+    const oppositePlayer = room.players.filter(player => player !== socket.id);
     this.wss.clients.forEach(client => {
       if (client.id !== oppositePlayer[0]) return;
       client.send(JSON.stringify({ action: ACTION_TYPES.PLAY_AGAIN }));
@@ -261,35 +250,32 @@ function WebSocket(options) {
   }
 
   async function resetGame(socket, { roomId }) {
-    let room;
+    let redisResponse;
     try {
-      room = await redis.hGetAll(roomId);
+      redisResponse = await redis.get(roomId);
     } catch (err) {
       return webSocketError(socket, err);
     }
+    const room = JSON.parse(redisResponse);
 
-    const playerTurn = Math.round(Math.random());
-    const newGameState = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
-    const updatePayload = {
-      playerTurn,
-      gameState: JSON.stringify(newGameState),
-    };
+    room.playerTurn = Math.round(Math.random());
+    room.gameState = [-1, -1, -1, -1, -1, -1, -1, -1, -1];
 
     try {
-      await redis.hSet(roomId, updatePayload);
+      await redis.set(roomId, JSON.stringify(room));
     } catch (err) {
       return webSocketError(socket, err);
     }
 
     const response = JSON.stringify({
       action: ACTION_TYPES.STATE_UPDATED,
-      gameState: newGameState,
+      gameState: room.gameState,
       gameStatus: GAME_STATUS.PLAYING,
-      playerTurn: playerTurn,
-      playersNicknames: JSON.parse(room.playersNicknames),
+      playerTurn: room.playerTurn,
+      playersNicknames: room.playersNicknames,
     });
-    const players = JSON.parse(room.players);
-    players.forEach(player => {
+
+    room.players.forEach(player => {
       this.wss.clients.forEach(client => {
         if (client.id !== player) return;
         client.send(response);
