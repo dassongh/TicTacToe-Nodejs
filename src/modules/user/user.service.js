@@ -70,4 +70,14 @@ function update(filter, setStatement) {
   return db.query(sql);
 }
 
-module.exports = { get, create, getById, count, deleteById, findByFilter, update };
+function getUsersScore() {
+  const sql = `
+    SELECT nickname, wins, losses, draws,
+    GREATEST(wins * 3 + draws - losses, 0) AS score
+    FROM users
+    ORDER BY score DESC;
+  `;
+  return db.query(sql);
+}
+
+module.exports = { get, create, getById, count, deleteById, findByFilter, update, getUsersScore };

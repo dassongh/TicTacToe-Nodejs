@@ -45,7 +45,7 @@ async function getById(id) {
     throw new CustomError(404, 'User not found');
   }
 
-  return { payload: { data: user.rows } };
+  return { payload: { data: user.rows[0] } };
 }
 
 async function deleteById(id) {

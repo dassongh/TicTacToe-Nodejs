@@ -57,10 +57,14 @@ async function register(userData, deviceId) {
 async function login({ email, password }, deviceId) {
   let dbResult;
   try {
-    dbResult = await userService.findByFilter(`email = '${email}'`);
+    dbResult = await userService.findByFilter(
+      `email = '${email}'`,
+      `id, fullname, nickname, email, "isOnline", password`
+    );
   } catch (err) {
     throw new DBError(err);
   }
+
   if (!dbResult.rowCount) {
     throw new CustomError(400, 'Password or email incorrect');
   }
@@ -70,6 +74,7 @@ async function login({ email, password }, deviceId) {
   if (passwordHash !== user.password) {
     throw new CustomError(400, 'Password or email incorrect');
   }
+  delete user.password;
 
   let sessionDbResult;
   try {

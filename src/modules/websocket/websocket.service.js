@@ -157,6 +157,46 @@ function WebSocket(options) {
 
     const gameStatus = handleResultValidation(newState);
 
+    const players = JSON.parse(room.players);
+    const playersSockets = [];
+    players.forEach(player => {
+      this.wss.clients.forEach(client => {
+        if (client.id !== player) return;
+        playersSockets.push(client);
+      });
+    });
+
+    if (gameStatus === GAME_STATUS.DRAW) {
+      const userIds = playersSockets.map(socket => socket.userId);
+      const filter = `id IN (${userIds.join(',')})`;
+      const setStatement = `draws = draws + 1`;
+      try {
+        await userService.update(filter, setStatement);
+      } catch (err) {
+        return webSocketError(socket, err);
+      }
+    }
+
+    if (gameStatus === GAME_STATUS.WIN) {
+      const gameResult = playersSockets.reduce((result, socket) => {
+        if (socket.id !== players[updatePayload.playerTurn]) {
+          result.winnerId = socket.userId;
+        } else {
+          result.looserId = socket.userId;
+        }
+        return result;
+      }, {});
+
+      try {
+        await Promise.all([
+          userService.update(`id = ${gameResult.winnerId}`, `wins = wins + 1`),
+          userService.update(`id = ${gameResult.looserId}`, `losses = losses + 1`),
+        ]);
+      } catch (err) {
+        return webSocketError(socket, err);
+      }
+    }
+
     const response = JSON.stringify({
       action: ACTION_TYPES.STATE_UPDATED,
       gameState: newState,
@@ -164,13 +204,7 @@ function WebSocket(options) {
       playerTurn: updatePayload.playerTurn,
       playersNicknames: JSON.parse(room.playersNicknames),
     });
-    const players = JSON.parse(room.players);
-    players.forEach(player => {
-      this.wss.clients.forEach(client => {
-        if (client.id !== player) return;
-        client.send(response);
-      });
-    });
+    playersSockets.forEach(socket => socket.send(response));
   }
 
   async function leaveGame(socket, { roomId }) {

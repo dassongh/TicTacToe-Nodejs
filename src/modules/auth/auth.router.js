@@ -32,15 +32,12 @@ module.exports = async function authRouter(req, res) {
   const pathName = parsedUrl.pathname;
 
   const match = matchRoute(pathName, Object.keys(routes));
-  if (!match) {
+  if (!match || !routes[match.route][req.method]) {
     return httpError(res, 404, 'Not found');
   }
 
   req.params = match.params;
   req.query = parsedUrl.query;
 
-  if (!routes[match.route][req.method]) {
-    return httpError(res, 404, 'Not found');
-  }
   routes[match.route][req.method](req, res);
 };

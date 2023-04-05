@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS users
     password character varying(200) NOT NULL,
     "socketId" character varying(40),
     "isOnline" boolean NOT NULL DEFAULT false,
-    "totalGames" integer NOT NULL DEFAULT 0,
     wins integer NOT NULL DEFAULT 0,
     losses integer NOT NULL DEFAULT 0,
     draws integer NOT NULL DEFAULT 0

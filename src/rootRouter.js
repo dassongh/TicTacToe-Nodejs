@@ -3,6 +3,7 @@ const renderLoginPage = require('./modules/page/loginPage');
 const renderRegisterPage = require('./modules/page/registerPage');
 const userRouter = require('./modules/user/user.router');
 const authRouter = require('./modules/auth/auth.router');
+const leaderboardRouter = require('./modules/leaderboard/leaderboard.router');
 
 const findRoute = require('./utils/findRoute');
 const httpError = require('./utils/httpError');
@@ -19,6 +20,7 @@ const routes = {
   '/app.css': serveStatic,
   '/api/user': userRouter,
   '/api/auth': authRouter,
+  '/api/leaderboard': leaderboardRouter,
 };
 
 module.exports = async function rootRouter(req, res) {
