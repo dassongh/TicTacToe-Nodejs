@@ -1,6 +1,8 @@
 const { DBError, CustomError } = require('../../utils/customErrors');
 const userService = require('./user.service');
 
+const APPID = process.env.APPID;
+
 async function get({ page, limit }) {
   const offset = (page - 1) * limit;
 
@@ -13,6 +15,8 @@ async function get({ page, limit }) {
   } catch (err) {
     throw new DBError(err);
   }
+
+  console.log('Get users from APP#: ' + APPID);
 
   return {
     payload: {

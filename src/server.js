@@ -10,7 +10,7 @@ const APPID = process.env.APPID;
 const server = http.createServer(rootRouter);
 
 server.listen(PORT, () => {
-  console.log('Server is running on port ' + PORT);
+  console.log('Server is running on port ' + PORT, 'AppID: ' + APPID);
   redisClient
     .connect()
     .then(() => console.log('Redis client connected'))
