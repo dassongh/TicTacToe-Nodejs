@@ -24,5 +24,5 @@ document.getElementById('form').addEventListener('submit', async e => {
 
   localStorage.setItem('accessToken', parsedResponse.data.tokens.access);
   localStorage.setItem('refreshToken', parsedResponse.data.tokens.refresh);
-  location.assign('http://localhost:1111');
+  location.assign('http://localhost:8080');
 });

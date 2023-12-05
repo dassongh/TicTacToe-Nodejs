@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:1111';
+export const BASE_URL = 'http://localhost:8080';
 export const WEB_SOCKET_URL = 'ws://localhost:1111';
 export const ACTION_TYPES = {
   ERROR: 'ERROR',
