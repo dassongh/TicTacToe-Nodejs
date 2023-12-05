@@ -5,7 +5,7 @@
 This project is written without using any frontend and backend libraries such as React.js or Express or
 whatever. This is done intentionally to show that is not that hard to write a backend on pure Node. And we
 still can make use of WebSocket protocol and have all that fancy stuff like modular architecture and load
-balancing. Same goes with frontend, tho frenkly speaking I would rather use something like React. Webpack
+balancing. Same goes with frontend, but, frankly speaking, I would rather use something like React. Webpack
 config was probably the hardest task for me. Additionally I haven't used classes syntax, just for fun.
 
 ### Technologies and tools
