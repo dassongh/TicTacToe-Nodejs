@@ -25,7 +25,7 @@ config was probably the hardest task for me. Additionally I haven't used classes
 1. Clone repository
 2. Cd into project directory
 3. Run **docker compose up**
-4. Go to **localhost:1111**
+4. Go to **localhost:8080** (nginx will proxy to 1111 or 2222)
 
 ### Steps to play the game
 
